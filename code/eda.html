@@ -1,0 +1,2372 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.3.450">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>Data Cleaning</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="eda_files/libs/clipboard/clipboard.min.js"></script>
+<script src="eda_files/libs/quarto-html/quarto.js"></script>
+<script src="eda_files/libs/quarto-html/popper.min.js"></script>
+<script src="eda_files/libs/quarto-html/tippy.umd.min.js"></script>
+<script src="eda_files/libs/quarto-html/anchor.min.js"></script>
+<link href="eda_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="eda_files/libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="eda_files/libs/bootstrap/bootstrap.min.js"></script>
+<link href="eda_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="eda_files/libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" integrity="sha512-c3Nl8+7g4LMSTdrm621y7kf9v3SDPnhxLNhcjFJbKECVnmZHTdo+IRO05sNLTH/D3vA6u1X32ehoLC7WFVdheg==" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js" integrity="sha512-bLT0Qm9VnAYZDflyKcBaQ2gg0hSYNQrJ8RilYldYQ1FxQYoCLtUjuuRuZo+fjqhx/qtq/1itJ0C2ejDxltZVFg==" crossorigin="anonymous"></script>
+<script type="application/javascript">define('jquery', [],function() {return window.jQuery;})</script>
+
+
+</head>
+
+<body class="fullcontent">
+
+<div id="quarto-content" class="page-columns page-rows-contents page-layout-article">
+
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">Data Cleaning</h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+</header>
+
+<div class="cell" data-execution_count="15">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> seaborn <span class="im">as</span> sns </span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell" data-execution_count="16">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> pd.read_csv(<span class="st">'../data/clean_data.csv'</span>)</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>df.shape</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="16">
+<pre><code>(80, 8)</code></pre>
+</div>
+</div>
+<div class="cell" data-execution_count="17">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>df.isna().<span class="bu">sum</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="17">
+<pre><code>Decision          0
+State             0
+GPA               0
+WorkExp           0
+TestScore         0
+WritingScore      0
+Gender            0
+VolunteerLevel    0
+dtype: int64</code></pre>
+</div>
+</div>
+<div class="cell" data-execution_count="18">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> df[df[<span class="st">'Decision'</span>].notna()]</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>df.head(<span class="dv">10</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="18">
+<div>
+
+
+<table class="dataframe table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">Decision</th>
+<th data-quarto-table-cell-role="th">State</th>
+<th data-quarto-table-cell-role="th">GPA</th>
+<th data-quarto-table-cell-role="th">WorkExp</th>
+<th data-quarto-table-cell-role="th">TestScore</th>
+<th data-quarto-table-cell-role="th">WritingScore</th>
+<th data-quarto-table-cell-role="th">Gender</th>
+<th data-quarto-table-cell-role="th">VolunteerLevel</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">0</td>
+<td>Admit</td>
+<td>California</td>
+<td>3.90</td>
+<td>6.7</td>
+<td>962.0</td>
+<td>100</td>
+<td>1.0</td>
+<td>0</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">1</td>
+<td>Admit</td>
+<td>Florida</td>
+<td>3.80</td>
+<td>1.4</td>
+<td>969.0</td>
+<td>97</td>
+<td>1.0</td>
+<td>4</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">2</td>
+<td>Admit</td>
+<td>Colorado</td>
+<td>3.60</td>
+<td>0.9</td>
+<td>969.0</td>
+<td>97</td>
+<td>0.0</td>
+<td>2</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">3</td>
+<td>Admit</td>
+<td>California</td>
+<td>3.88</td>
+<td>1.5</td>
+<td>967.0</td>
+<td>95</td>
+<td>1.0</td>
+<td>5</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">4</td>
+<td>Admit</td>
+<td>California</td>
+<td>3.70</td>
+<td>1.2</td>
+<td>969.0</td>
+<td>94</td>
+<td>1.0</td>
+<td>2</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">5</td>
+<td>Admit</td>
+<td>Florida</td>
+<td>3.90</td>
+<td>4.7</td>
+<td>961.0</td>
+<td>93</td>
+<td>1.0</td>
+<td>1</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">6</td>
+<td>Admit</td>
+<td>California</td>
+<td>3.70</td>
+<td>1.4</td>
+<td>966.0</td>
+<td>94</td>
+<td>1.0</td>
+<td>0</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">7</td>
+<td>Admit</td>
+<td>Florida</td>
+<td>3.93</td>
+<td>0.8</td>
+<td>969.0</td>
+<td>99</td>
+<td>1.0</td>
+<td>4</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">8</td>
+<td>Admit</td>
+<td>Colorado</td>
+<td>3.60</td>
+<td>1.2</td>
+<td>967.0</td>
+<td>94</td>
+<td>1.0</td>
+<td>2</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">9</td>
+<td>Admit</td>
+<td>California</td>
+<td>3.69</td>
+<td>3.2</td>
+<td>967.0</td>
+<td>93</td>
+<td>0.0</td>
+<td>3</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+<div class="cell" data-execution_count="19">
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>df.isna().<span class="bu">sum</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="19">
+<pre><code>Decision          0
+State             0
+GPA               0
+WorkExp           0
+TestScore         0
+WritingScore      0
+Gender            0
+VolunteerLevel    0
+dtype: int64</code></pre>
+</div>
+</div>
+<div class="cell" data-execution_count="20">
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> df.dropna()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell" data-execution_count="21">
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="co"># remove nonsensical answers in Decision and Gender columns</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>df[<span class="st">'Decision'</span>].unique()</span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> df[df[<span class="st">'Decision'</span>] <span class="op">!=</span> <span class="st">'Banana'</span>]</span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(df.shape)</span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> df.drop(df[df[<span class="st">"Gender"</span>] <span class="op">&lt;</span> <span class="dv">0</span>].index)</span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> df.drop(df[df[<span class="st">"WorkExp"</span>] <span class="op">&gt;</span> <span class="dv">50</span>].index)</span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> df.drop(df[df[<span class="st">"GPA"</span>] <span class="op">&gt;</span> <span class="dv">5</span>].index)</span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a>df.head()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>(80, 8)</code></pre>
+</div>
+<div class="cell-output cell-output-display" data-execution_count="21">
+<div>
+
+
+<table class="dataframe table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">Decision</th>
+<th data-quarto-table-cell-role="th">State</th>
+<th data-quarto-table-cell-role="th">GPA</th>
+<th data-quarto-table-cell-role="th">WorkExp</th>
+<th data-quarto-table-cell-role="th">TestScore</th>
+<th data-quarto-table-cell-role="th">WritingScore</th>
+<th data-quarto-table-cell-role="th">Gender</th>
+<th data-quarto-table-cell-role="th">VolunteerLevel</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">0</td>
+<td>Admit</td>
+<td>California</td>
+<td>3.90</td>
+<td>6.7</td>
+<td>962.0</td>
+<td>100</td>
+<td>1.0</td>
+<td>0</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">1</td>
+<td>Admit</td>
+<td>Florida</td>
+<td>3.80</td>
+<td>1.4</td>
+<td>969.0</td>
+<td>97</td>
+<td>1.0</td>
+<td>4</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">2</td>
+<td>Admit</td>
+<td>Colorado</td>
+<td>3.60</td>
+<td>0.9</td>
+<td>969.0</td>
+<td>97</td>
+<td>0.0</td>
+<td>2</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">3</td>
+<td>Admit</td>
+<td>California</td>
+<td>3.88</td>
+<td>1.5</td>
+<td>967.0</td>
+<td>95</td>
+<td>1.0</td>
+<td>5</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">4</td>
+<td>Admit</td>
+<td>California</td>
+<td>3.70</td>
+<td>1.2</td>
+<td>969.0</td>
+<td>94</td>
+<td>1.0</td>
+<td>2</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+<div class="cell" data-execution_count="22">
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="co"># capitalize all states</span></span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>df.State <span class="op">=</span> df.State.<span class="bu">str</span>.title()</span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>df[<span class="st">'State'</span>] <span class="op">=</span> df[<span class="st">'State'</span>].replace(<span class="st">'New york'</span>, <span class="st">'New York'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell" data-execution_count="23">
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Save to csv</span></span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>df.to_csv(<span class="st">"../data/clean_data.csv"</span>, index<span class="op">=</span><span class="va">False</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<section id="visualizations" class="level2">
+<h2 class="anchored" data-anchor-id="visualizations">Visualizations</h2>
+<div class="cell" data-execution_count="24">
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Hide output with -q</span></span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a><span class="op">!</span>pip install <span class="op">-</span>q altair</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell" data-execution_count="25">
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>decision_count <span class="op">=</span> df.groupby([<span class="st">'Decision'</span>, <span class="st">'State'</span>]).size().reset_index()</span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>decision_count <span class="op">=</span> decision_count.rename(columns<span class="op">=</span>{<span class="dv">0</span>: <span class="st">'Count'</span>})</span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>decision_count</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="25">
+<div>
+
+
+<table class="dataframe table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">Decision</th>
+<th data-quarto-table-cell-role="th">State</th>
+<th data-quarto-table-cell-role="th">Count</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">0</td>
+<td>Admit</td>
+<td>California</td>
+<td>9</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">1</td>
+<td>Admit</td>
+<td>Colorado</td>
+<td>8</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">2</td>
+<td>Admit</td>
+<td>Florida</td>
+<td>11</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">3</td>
+<td>Admit</td>
+<td>Utah</td>
+<td>1</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">4</td>
+<td>Decline</td>
+<td>California</td>
+<td>1</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">5</td>
+<td>Decline</td>
+<td>Colorado</td>
+<td>6</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">6</td>
+<td>Decline</td>
+<td>Florida</td>
+<td>13</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">7</td>
+<td>Decline</td>
+<td>Mississippi</td>
+<td>1</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">8</td>
+<td>Decline</td>
+<td>Oregon</td>
+<td>1</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">9</td>
+<td>Decline</td>
+<td>Utah</td>
+<td>2</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">10</td>
+<td>Decline</td>
+<td>Virginia</td>
+<td>4</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">11</td>
+<td>Waitlist</td>
+<td>Alabama</td>
+<td>1</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">12</td>
+<td>Waitlist</td>
+<td>California</td>
+<td>2</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">13</td>
+<td>Waitlist</td>
+<td>Colorado</td>
+<td>4</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">14</td>
+<td>Waitlist</td>
+<td>Florida</td>
+<td>11</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">15</td>
+<td>Waitlist</td>
+<td>New York</td>
+<td>1</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">16</td>
+<td>Waitlist</td>
+<td>Utah</td>
+<td>3</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">17</td>
+<td>Waitlist</td>
+<td>Vermont</td>
+<td>1</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+<div class="cell" data-execution_count="26">
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> altair <span class="im">as</span> alt</span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>unique_states <span class="op">=</span> decision_count[<span class="st">'State'</span>].unique().tolist()</span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Dropdown selection</span></span>
+<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a>input_dropdown <span class="op">=</span> alt.binding_select(options<span class="op">=</span>[<span class="va">None</span>] <span class="op">+</span> unique_states, labels <span class="op">=</span> [<span class="st">'All'</span>] <span class="op">+</span> unique_states, name<span class="op">=</span><span class="st">'State'</span>)</span>
+<span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a>selection <span class="op">=</span> alt.selection_single(fields<span class="op">=</span>[<span class="st">'State'</span>], bind<span class="op">=</span>input_dropdown)</span>
+<span id="cb16-8"><a href="#cb16-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-9"><a href="#cb16-9" aria-hidden="true" tabindex="-1"></a>decision_bar <span class="op">=</span> alt.Chart(decision_count).transform_filter(</span>
+<span id="cb16-10"><a href="#cb16-10" aria-hidden="true" tabindex="-1"></a>    selection</span>
+<span id="cb16-11"><a href="#cb16-11" aria-hidden="true" tabindex="-1"></a>).mark_bar().encode(</span>
+<span id="cb16-12"><a href="#cb16-12" aria-hidden="true" tabindex="-1"></a>    alt.X(<span class="st">'Decision:O'</span>, title<span class="op">=</span><span class="st">'Decision'</span>),</span>
+<span id="cb16-13"><a href="#cb16-13" aria-hidden="true" tabindex="-1"></a>    alt.Y(<span class="st">'Count:Q'</span>, title<span class="op">=</span><span class="st">'Count'</span>),</span>
+<span id="cb16-14"><a href="#cb16-14" aria-hidden="true" tabindex="-1"></a>).add_selection(selection).interactive()</span>
+<span id="cb16-15"><a href="#cb16-15" aria-hidden="true" tabindex="-1"></a>chart_title <span class="op">=</span> <span class="st">"Bar Chart of Decision Results Counts for States"</span></span>
+<span id="cb16-16"><a href="#cb16-16" aria-hidden="true" tabindex="-1"></a>decision_bar <span class="op">=</span> decision_bar.properties(title<span class="op">=</span>chart_title)</span>
+<span id="cb16-17"><a href="#cb16-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-18"><a href="#cb16-18" aria-hidden="true" tabindex="-1"></a>decision_bar</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>c:\Users\theda\anaconda3\Lib\site-packages\altair\utils\deprecation.py:65: AltairDeprecationWarning: 'selection_single' is deprecated.  Use 'selection_point'
+  warnings.warn(message, AltairDeprecationWarning, stacklevel=1)
+c:\Users\theda\anaconda3\Lib\site-packages\altair\utils\deprecation.py:65: AltairDeprecationWarning: 'add_selection' is deprecated. Use 'add_params' instead.
+  warnings.warn(message, AltairDeprecationWarning, stacklevel=1)</code></pre>
+</div>
+<div class="cell-output cell-output-display" data-execution_count="26">
+
+<style>
+  #altair-viz-cf4e038e18f1487c8bc4a657a105a0f5.vega-embed {
+    width: 100%;
+    display: flex;
+  }
+
+  #altair-viz-cf4e038e18f1487c8bc4a657a105a0f5.vega-embed details,
+  #altair-viz-cf4e038e18f1487c8bc4a657a105a0f5.vega-embed details summary {
+    position: relative;
+  }
+</style>
+<div id="altair-viz-cf4e038e18f1487c8bc4a657a105a0f5"></div>
+<script type="text/javascript">
+  var VEGA_DEBUG = (typeof VEGA_DEBUG == "undefined") ? {} : VEGA_DEBUG;
+  (function(spec, embedOpt){
+    let outputDiv = document.currentScript.previousElementSibling;
+    if (outputDiv.id !== "altair-viz-cf4e038e18f1487c8bc4a657a105a0f5") {
+      outputDiv = document.getElementById("altair-viz-cf4e038e18f1487c8bc4a657a105a0f5");
+    }
+    const paths = {
+      "vega": "https://cdn.jsdelivr.net/npm/vega@5?noext",
+      "vega-lib": "https://cdn.jsdelivr.net/npm/vega-lib?noext",
+      "vega-lite": "https://cdn.jsdelivr.net/npm/vega-lite@5.8.0?noext",
+      "vega-embed": "https://cdn.jsdelivr.net/npm/vega-embed@6?noext",
+    };
+
+    function maybeLoadScript(lib, version) {
+      var key = `${lib.replace("-", "")}_version`;
+      return (VEGA_DEBUG[key] == version) ?
+        Promise.resolve(paths[lib]) :
+        new Promise(function(resolve, reject) {
+          var s = document.createElement('script');
+          document.getElementsByTagName("head")[0].appendChild(s);
+          s.async = true;
+          s.onload = () => {
+            VEGA_DEBUG[key] = version;
+            return resolve(paths[lib]);
+          };
+          s.onerror = () => reject(`Error loading script: ${paths[lib]}`);
+          s.src = paths[lib];
+        });
+    }
+
+    function showError(err) {
+      outputDiv.innerHTML = `<div class="error" style="color:red;">${err}</div>`;
+      throw err;
+    }
+
+    function displayChart(vegaEmbed) {
+      vegaEmbed(outputDiv, spec, embedOpt)
+        .catch(err => showError(`Javascript Error: ${err.message}<br>This usually means there's a typo in your chart specification. See the javascript console for the full traceback.`));
+    }
+
+    if(typeof define === "function" && define.amd) {
+      requirejs.config({paths});
+      require(["vega-embed"], displayChart, err => showError(`Error loading script: ${err.message}`));
+    } else {
+      maybeLoadScript("vega", "5")
+        .then(() => maybeLoadScript("vega-lite", "5.8.0"))
+        .then(() => maybeLoadScript("vega-embed", "6"))
+        .catch(showError)
+        .then(() => displayChart(vegaEmbed));
+    }
+  })({"config": {"view": {"continuousWidth": 300, "continuousHeight": 300}}, "data": {"name": "data-c5deeb307545589756637cd1b5598547"}, "mark": {"type": "bar"}, "encoding": {"x": {"field": "Decision", "title": "Decision", "type": "ordinal"}, "y": {"field": "Count", "title": "Count", "type": "quantitative"}}, "params": [{"name": "param_3", "select": {"type": "point", "fields": ["State"]}, "bind": {"input": "select", "options": [null, "California", "Colorado", "Florida", "Utah", "Mississippi", "Oregon", "Virginia", "Alabama", "New York", "Vermont"], "labels": ["All", "California", "Colorado", "Florida", "Utah", "Mississippi", "Oregon", "Virginia", "Alabama", "New York", "Vermont"], "name": "State"}}, {"name": "param_4", "select": {"type": "interval", "encodings": ["x", "y"]}, "bind": "scales"}], "title": "Bar Chart of Decision Results Counts for States", "transform": [{"filter": {"param": "param_3"}}], "$schema": "https://vega.github.io/schema/vega-lite/v5.8.0.json", "datasets": {"data-c5deeb307545589756637cd1b5598547": [{"Decision": "Admit", "State": "California", "Count": 9}, {"Decision": "Admit", "State": "Colorado", "Count": 8}, {"Decision": "Admit", "State": "Florida", "Count": 11}, {"Decision": "Admit", "State": "Utah", "Count": 1}, {"Decision": "Decline", "State": "California", "Count": 1}, {"Decision": "Decline", "State": "Colorado", "Count": 6}, {"Decision": "Decline", "State": "Florida", "Count": 13}, {"Decision": "Decline", "State": "Mississippi", "Count": 1}, {"Decision": "Decline", "State": "Oregon", "Count": 1}, {"Decision": "Decline", "State": "Utah", "Count": 2}, {"Decision": "Decline", "State": "Virginia", "Count": 4}, {"Decision": "Waitlist", "State": "Alabama", "Count": 1}, {"Decision": "Waitlist", "State": "California", "Count": 2}, {"Decision": "Waitlist", "State": "Colorado", "Count": 4}, {"Decision": "Waitlist", "State": "Florida", "Count": 11}, {"Decision": "Waitlist", "State": "New York", "Count": 1}, {"Decision": "Waitlist", "State": "Utah", "Count": 3}, {"Decision": "Waitlist", "State": "Vermont", "Count": 1}]}}, {"mode": "vega-lite"});
+</script>
+</div>
+</div>
+<div class="cell" data-execution_count="27">
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>custom_palette <span class="op">=</span> [<span class="st">'#00072D'</span>, <span class="st">'#0A2472'</span>, <span class="st">'#0E6BA8'</span>, <span class="st">'#A6E1FA'</span>, <span class="st">'#99ABC5'</span>, <span class="st">'#8B748F'</span>, <span class="st">'#6F0624'</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell" data-execution_count="28">
+<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> altair <span class="im">as</span> alt</span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>unique_states <span class="op">=</span> decision_count[<span class="st">'State'</span>].unique().tolist()</span>
+<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a><span class="co"># # Dropdown selection</span></span>
+<span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a><span class="co"># input_dropdown = alt.binding_select(options=[None] + unique_states, labels = ['All'] + unique_states, name='State')</span></span>
+<span id="cb19-7"><a href="#cb19-7" aria-hidden="true" tabindex="-1"></a><span class="co"># selection = alt.selection_single(fields=['State'], bind=input_dropdown)</span></span>
+<span id="cb19-8"><a href="#cb19-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-9"><a href="#cb19-9" aria-hidden="true" tabindex="-1"></a>decision_bar <span class="op">=</span> alt.Chart(decision_count).mark_bar().encode(</span>
+<span id="cb19-10"><a href="#cb19-10" aria-hidden="true" tabindex="-1"></a>    x<span class="op">=</span>alt.X(<span class="st">'Decision:O'</span>, title<span class="op">=</span><span class="st">'Decision'</span>, axis<span class="op">=</span>alt.Axis(labelAngle<span class="op">=</span><span class="dv">0</span>), sort<span class="op">=</span><span class="st">'-y'</span>),</span>
+<span id="cb19-11"><a href="#cb19-11" aria-hidden="true" tabindex="-1"></a>    y<span class="op">=</span>alt.Y(<span class="st">'Count:Q'</span>, title<span class="op">=</span><span class="st">'Count'</span>),</span>
+<span id="cb19-12"><a href="#cb19-12" aria-hidden="true" tabindex="-1"></a>    xOffset<span class="op">=</span><span class="st">'State'</span>,</span>
+<span id="cb19-13"><a href="#cb19-13" aria-hidden="true" tabindex="-1"></a>    color<span class="op">=</span>alt.Color(<span class="st">'State:N'</span>, sort<span class="op">=</span>alt.EncodingSortField(field<span class="op">=</span><span class="st">'Count'</span>, op<span class="op">=</span><span class="st">'sum'</span>, order<span class="op">=</span><span class="st">'descending'</span>), scale<span class="op">=</span>alt.Scale(<span class="bu">range</span><span class="op">=</span>custom_palette))</span>
+<span id="cb19-14"><a href="#cb19-14" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb19-15"><a href="#cb19-15" aria-hidden="true" tabindex="-1"></a>chart_title <span class="op">=</span> <span class="st">"Bar Chart of Decision Results Counts for States"</span></span>
+<span id="cb19-16"><a href="#cb19-16" aria-hidden="true" tabindex="-1"></a>decision_bar <span class="op">=</span> decision_bar.properties(title<span class="op">=</span>chart_title)</span>
+<span id="cb19-17"><a href="#cb19-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-18"><a href="#cb19-18" aria-hidden="true" tabindex="-1"></a>decision_bar</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="28">
+
+<style>
+  #altair-viz-e76ff66ca74f48e28cfdfdfb97e98444.vega-embed {
+    width: 100%;
+    display: flex;
+  }
+
+  #altair-viz-e76ff66ca74f48e28cfdfdfb97e98444.vega-embed details,
+  #altair-viz-e76ff66ca74f48e28cfdfdfb97e98444.vega-embed details summary {
+    position: relative;
+  }
+</style>
+<div id="altair-viz-e76ff66ca74f48e28cfdfdfb97e98444"></div>
+<script type="text/javascript">
+  var VEGA_DEBUG = (typeof VEGA_DEBUG == "undefined") ? {} : VEGA_DEBUG;
+  (function(spec, embedOpt){
+    let outputDiv = document.currentScript.previousElementSibling;
+    if (outputDiv.id !== "altair-viz-e76ff66ca74f48e28cfdfdfb97e98444") {
+      outputDiv = document.getElementById("altair-viz-e76ff66ca74f48e28cfdfdfb97e98444");
+    }
+    const paths = {
+      "vega": "https://cdn.jsdelivr.net/npm/vega@5?noext",
+      "vega-lib": "https://cdn.jsdelivr.net/npm/vega-lib?noext",
+      "vega-lite": "https://cdn.jsdelivr.net/npm/vega-lite@5.8.0?noext",
+      "vega-embed": "https://cdn.jsdelivr.net/npm/vega-embed@6?noext",
+    };
+
+    function maybeLoadScript(lib, version) {
+      var key = `${lib.replace("-", "")}_version`;
+      return (VEGA_DEBUG[key] == version) ?
+        Promise.resolve(paths[lib]) :
+        new Promise(function(resolve, reject) {
+          var s = document.createElement('script');
+          document.getElementsByTagName("head")[0].appendChild(s);
+          s.async = true;
+          s.onload = () => {
+            VEGA_DEBUG[key] = version;
+            return resolve(paths[lib]);
+          };
+          s.onerror = () => reject(`Error loading script: ${paths[lib]}`);
+          s.src = paths[lib];
+        });
+    }
+
+    function showError(err) {
+      outputDiv.innerHTML = `<div class="error" style="color:red;">${err}</div>`;
+      throw err;
+    }
+
+    function displayChart(vegaEmbed) {
+      vegaEmbed(outputDiv, spec, embedOpt)
+        .catch(err => showError(`Javascript Error: ${err.message}<br>This usually means there's a typo in your chart specification. See the javascript console for the full traceback.`));
+    }
+
+    if(typeof define === "function" && define.amd) {
+      requirejs.config({paths});
+      require(["vega-embed"], displayChart, err => showError(`Error loading script: ${err.message}`));
+    } else {
+      maybeLoadScript("vega", "5")
+        .then(() => maybeLoadScript("vega-lite", "5.8.0"))
+        .then(() => maybeLoadScript("vega-embed", "6"))
+        .catch(showError)
+        .then(() => displayChart(vegaEmbed));
+    }
+  })({"config": {"view": {"continuousWidth": 300, "continuousHeight": 300}}, "data": {"name": "data-c5deeb307545589756637cd1b5598547"}, "mark": {"type": "bar"}, "encoding": {"color": {"field": "State", "scale": {"range": ["#00072D", "#0A2472", "#0E6BA8", "#A6E1FA", "#99ABC5", "#8B748F", "#6F0624"]}, "sort": {"field": "Count", "op": "sum", "order": "descending"}, "type": "nominal"}, "x": {"axis": {"labelAngle": 0}, "field": "Decision", "sort": "-y", "title": "Decision", "type": "ordinal"}, "xOffset": {"field": "State", "type": "nominal"}, "y": {"field": "Count", "title": "Count", "type": "quantitative"}}, "title": "Bar Chart of Decision Results Counts for States", "$schema": "https://vega.github.io/schema/vega-lite/v5.8.0.json", "datasets": {"data-c5deeb307545589756637cd1b5598547": [{"Decision": "Admit", "State": "California", "Count": 9}, {"Decision": "Admit", "State": "Colorado", "Count": 8}, {"Decision": "Admit", "State": "Florida", "Count": 11}, {"Decision": "Admit", "State": "Utah", "Count": 1}, {"Decision": "Decline", "State": "California", "Count": 1}, {"Decision": "Decline", "State": "Colorado", "Count": 6}, {"Decision": "Decline", "State": "Florida", "Count": 13}, {"Decision": "Decline", "State": "Mississippi", "Count": 1}, {"Decision": "Decline", "State": "Oregon", "Count": 1}, {"Decision": "Decline", "State": "Utah", "Count": 2}, {"Decision": "Decline", "State": "Virginia", "Count": 4}, {"Decision": "Waitlist", "State": "Alabama", "Count": 1}, {"Decision": "Waitlist", "State": "California", "Count": 2}, {"Decision": "Waitlist", "State": "Colorado", "Count": 4}, {"Decision": "Waitlist", "State": "Florida", "Count": 11}, {"Decision": "Waitlist", "State": "New York", "Count": 1}, {"Decision": "Waitlist", "State": "Utah", "Count": 3}, {"Decision": "Waitlist", "State": "Vermont", "Count": 1}]}}, {"mode": "vega-lite"});
+</script>
+</div>
+</div>
+<div class="cell" data-execution_count="29">
+<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>df.hist(<span class="st">'TestScore'</span>, by<span class="op">=</span><span class="st">'Decision'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="29">
+<pre><code>array([[&lt;Axes: title={'center': 'Admit'}&gt;,
+        &lt;Axes: title={'center': 'Decline'}&gt;],
+       [&lt;Axes: title={'center': 'Waitlist'}&gt;, &lt;Axes: &gt;]], dtype=object)</code></pre>
+</div>
+<div class="cell-output cell-output-display">
+<p><img src="eda_files/figure-html/cell-17-output-2.png" class="img-fluid"></p>
+</div>
+</div>
+<div class="cell" data-execution_count="30">
+<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a>sns.histplot(x<span class="op">=</span><span class="st">"TestScore"</span>, hue<span class="op">=</span><span class="st">"Decision"</span>, data<span class="op">=</span>df, bins<span class="op">=</span><span class="dv">20</span>).<span class="bu">set</span>(title<span class="op">=</span><span class="st">'Histogram of Test Scores by Decision'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="30">
+<pre><code>[Text(0.5, 1.0, 'Histogram of Test Scores by Decision')]</code></pre>
+</div>
+<div class="cell-output cell-output-display">
+<p><img src="eda_files/figure-html/cell-18-output-2.png" class="img-fluid"></p>
+</div>
+</div>
+<div class="cell" data-execution_count="31">
+<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Dropdown selection</span></span>
+<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a>input_dropdown <span class="op">=</span> alt.binding_select(options<span class="op">=</span>[<span class="va">None</span>] <span class="op">+</span> unique_states, labels <span class="op">=</span> [<span class="st">'All'</span>] <span class="op">+</span> unique_states, name<span class="op">=</span><span class="st">'State'</span>)</span>
+<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a>selection <span class="op">=</span> alt.selection_single(fields<span class="op">=</span>[<span class="st">'State'</span>], bind<span class="op">=</span>input_dropdown)</span>
+<span id="cb24-4"><a href="#cb24-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-5"><a href="#cb24-5" aria-hidden="true" tabindex="-1"></a>gpa_bar <span class="op">=</span> alt.Chart(df).transform_filter(</span>
+<span id="cb24-6"><a href="#cb24-6" aria-hidden="true" tabindex="-1"></a>    selection</span>
+<span id="cb24-7"><a href="#cb24-7" aria-hidden="true" tabindex="-1"></a>).mark_bar(</span>
+<span id="cb24-8"><a href="#cb24-8" aria-hidden="true" tabindex="-1"></a>    opacity<span class="op">=</span><span class="fl">0.5</span>,</span>
+<span id="cb24-9"><a href="#cb24-9" aria-hidden="true" tabindex="-1"></a>    binSpacing<span class="op">=</span><span class="dv">0</span></span>
+<span id="cb24-10"><a href="#cb24-10" aria-hidden="true" tabindex="-1"></a>).encode(</span>
+<span id="cb24-11"><a href="#cb24-11" aria-hidden="true" tabindex="-1"></a>    alt.X(<span class="st">'GPA:Q'</span>),</span>
+<span id="cb24-12"><a href="#cb24-12" aria-hidden="true" tabindex="-1"></a>    alt.Y(<span class="st">'count()'</span>, title<span class="op">=</span><span class="st">'Count of Occurrences'</span>),</span>
+<span id="cb24-13"><a href="#cb24-13" aria-hidden="true" tabindex="-1"></a>    alt.Color(<span class="st">'Decision:N'</span>)</span>
+<span id="cb24-14"><a href="#cb24-14" aria-hidden="true" tabindex="-1"></a>).add_selection(selection).interactive()</span>
+<span id="cb24-15"><a href="#cb24-15" aria-hidden="true" tabindex="-1"></a>chart_title <span class="op">=</span> <span class="st">"Histogram of GPA by Decision Result for States"</span></span>
+<span id="cb24-16"><a href="#cb24-16" aria-hidden="true" tabindex="-1"></a>gpa_bar <span class="op">=</span> gpa_bar.properties(title<span class="op">=</span>chart_title)</span>
+<span id="cb24-17"><a href="#cb24-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-18"><a href="#cb24-18" aria-hidden="true" tabindex="-1"></a>gpa_bar</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>c:\Users\theda\anaconda3\Lib\site-packages\altair\utils\deprecation.py:65: AltairDeprecationWarning: 'selection_single' is deprecated.  Use 'selection_point'
+  warnings.warn(message, AltairDeprecationWarning, stacklevel=1)
+c:\Users\theda\anaconda3\Lib\site-packages\altair\utils\deprecation.py:65: AltairDeprecationWarning: 'add_selection' is deprecated. Use 'add_params' instead.
+  warnings.warn(message, AltairDeprecationWarning, stacklevel=1)</code></pre>
+</div>
+<div class="cell-output cell-output-display" data-execution_count="31">
+
+<style>
+  #altair-viz-6d7e19cb25c544caa615b71eadc1defd.vega-embed {
+    width: 100%;
+    display: flex;
+  }
+
+  #altair-viz-6d7e19cb25c544caa615b71eadc1defd.vega-embed details,
+  #altair-viz-6d7e19cb25c544caa615b71eadc1defd.vega-embed details summary {
+    position: relative;
+  }
+</style>
+<div id="altair-viz-6d7e19cb25c544caa615b71eadc1defd"></div>
+<script type="text/javascript">
+  var VEGA_DEBUG = (typeof VEGA_DEBUG == "undefined") ? {} : VEGA_DEBUG;
+  (function(spec, embedOpt){
+    let outputDiv = document.currentScript.previousElementSibling;
+    if (outputDiv.id !== "altair-viz-6d7e19cb25c544caa615b71eadc1defd") {
+      outputDiv = document.getElementById("altair-viz-6d7e19cb25c544caa615b71eadc1defd");
+    }
+    const paths = {
+      "vega": "https://cdn.jsdelivr.net/npm/vega@5?noext",
+      "vega-lib": "https://cdn.jsdelivr.net/npm/vega-lib?noext",
+      "vega-lite": "https://cdn.jsdelivr.net/npm/vega-lite@5.8.0?noext",
+      "vega-embed": "https://cdn.jsdelivr.net/npm/vega-embed@6?noext",
+    };
+
+    function maybeLoadScript(lib, version) {
+      var key = `${lib.replace("-", "")}_version`;
+      return (VEGA_DEBUG[key] == version) ?
+        Promise.resolve(paths[lib]) :
+        new Promise(function(resolve, reject) {
+          var s = document.createElement('script');
+          document.getElementsByTagName("head")[0].appendChild(s);
+          s.async = true;
+          s.onload = () => {
+            VEGA_DEBUG[key] = version;
+            return resolve(paths[lib]);
+          };
+          s.onerror = () => reject(`Error loading script: ${paths[lib]}`);
+          s.src = paths[lib];
+        });
+    }
+
+    function showError(err) {
+      outputDiv.innerHTML = `<div class="error" style="color:red;">${err}</div>`;
+      throw err;
+    }
+
+    function displayChart(vegaEmbed) {
+      vegaEmbed(outputDiv, spec, embedOpt)
+        .catch(err => showError(`Javascript Error: ${err.message}<br>This usually means there's a typo in your chart specification. See the javascript console for the full traceback.`));
+    }
+
+    if(typeof define === "function" && define.amd) {
+      requirejs.config({paths});
+      require(["vega-embed"], displayChart, err => showError(`Error loading script: ${err.message}`));
+    } else {
+      maybeLoadScript("vega", "5")
+        .then(() => maybeLoadScript("vega-lite", "5.8.0"))
+        .then(() => maybeLoadScript("vega-embed", "6"))
+        .catch(showError)
+        .then(() => displayChart(vegaEmbed));
+    }
+  })({"config": {"view": {"continuousWidth": 300, "continuousHeight": 300}}, "data": {"name": "data-92a7c7e9ee40db10d3ddcd8747bca94b"}, "mark": {"type": "bar", "binSpacing": 0, "opacity": 0.5}, "encoding": {"color": {"field": "Decision", "type": "nominal"}, "x": {"field": "GPA", "type": "quantitative"}, "y": {"aggregate": "count", "title": "Count of Occurrences", "type": "quantitative"}}, "params": [{"name": "param_5", "select": {"type": "point", "fields": ["State"]}, "bind": {"input": "select", "options": [null, "California", "Colorado", "Florida", "Utah", "Mississippi", "Oregon", "Virginia", "Alabama", "New York", "Vermont"], "labels": ["All", "California", "Colorado", "Florida", "Utah", "Mississippi", "Oregon", "Virginia", "Alabama", "New York", "Vermont"], "name": "State"}}, {"name": "param_6", "select": {"type": "interval", "encodings": ["x", "y"]}, "bind": "scales"}], "title": "Histogram of GPA by Decision Result for States", "transform": [{"filter": {"param": "param_5"}}], "$schema": "https://vega.github.io/schema/vega-lite/v5.8.0.json", "datasets": {"data-92a7c7e9ee40db10d3ddcd8747bca94b": [{"Decision": "Admit", "State": "California", "GPA": 3.9, "WorkExp": 6.7, "TestScore": 962.0, "WritingScore": 100, "Gender": 1.0, "VolunteerLevel": 0}, {"Decision": "Admit", "State": "Florida", "GPA": 3.8, "WorkExp": 1.4, "TestScore": 969.0, "WritingScore": 97, "Gender": 1.0, "VolunteerLevel": 4}, {"Decision": "Admit", "State": "Colorado", "GPA": 3.6, "WorkExp": 0.9, "TestScore": 969.0, "WritingScore": 97, "Gender": 0.0, "VolunteerLevel": 2}, {"Decision": "Admit", "State": "California", "GPA": 3.88, "WorkExp": 1.5, "TestScore": 967.0, "WritingScore": 95, "Gender": 1.0, "VolunteerLevel": 5}, {"Decision": "Admit", "State": "California", "GPA": 3.7, "WorkExp": 1.2, "TestScore": 969.0, "WritingScore": 94, "Gender": 1.0, "VolunteerLevel": 2}, {"Decision": "Admit", "State": "Florida", "GPA": 3.9, "WorkExp": 4.7, "TestScore": 961.0, "WritingScore": 93, "Gender": 1.0, "VolunteerLevel": 1}, {"Decision": "Admit", "State": "California", "GPA": 3.7, "WorkExp": 1.4, "TestScore": 966.0, "WritingScore": 94, "Gender": 1.0, "VolunteerLevel": 0}, {"Decision": "Admit", "State": "Florida", "GPA": 3.93, "WorkExp": 0.8, "TestScore": 969.0, "WritingScore": 99, "Gender": 1.0, "VolunteerLevel": 4}, {"Decision": "Admit", "State": "Colorado", "GPA": 3.6, "WorkExp": 1.2, "TestScore": 967.0, "WritingScore": 94, "Gender": 1.0, "VolunteerLevel": 2}, {"Decision": "Admit", "State": "California", "GPA": 3.69, "WorkExp": 3.2, "TestScore": 967.0, "WritingScore": 93, "Gender": 0.0, "VolunteerLevel": 3}, {"Decision": "Admit", "State": "Florida", "GPA": 3.7, "WorkExp": 3.7, "TestScore": 969.0, "WritingScore": 99, "Gender": 0.0, "VolunteerLevel": 2}, {"Decision": "Admit", "State": "Colorado", "GPA": 3.9, "WorkExp": 3.8, "TestScore": 967.0, "WritingScore": 98, "Gender": 1.0, "VolunteerLevel": 3}, {"Decision": "Admit", "State": "Colorado", "GPA": 3.78, "WorkExp": 1.2, "TestScore": 966.0, "WritingScore": 1, "Gender": 0.0, "VolunteerLevel": 4}, {"Decision": "Admit", "State": "California", "GPA": 3.7, "WorkExp": 2.7, "TestScore": 799.0, "WritingScore": 97, "Gender": 0.0, "VolunteerLevel": 5}, {"Decision": "Admit", "State": "Florida", "GPA": 3.5, "WorkExp": 0.7, "TestScore": 965.0, "WritingScore": 91, "Gender": 0.0, "VolunteerLevel": 1}, {"Decision": "Admit", "State": "Colorado", "GPA": 3.65, "WorkExp": 1.7, "TestScore": 963.0, "WritingScore": 90, "Gender": 0.0, "VolunteerLevel": 1}, {"Decision": "Admit", "State": "Colorado", "GPA": 3.75, "WorkExp": 1.1, "TestScore": 969.0, "WritingScore": 93, "Gender": 1.0, "VolunteerLevel": 0}, {"Decision": "Admit", "State": "California", "GPA": 3.78, "WorkExp": 8.7, "TestScore": 966.0, "WritingScore": 91, "Gender": 0.0, "VolunteerLevel": 2}, {"Decision": "Admit", "State": "Florida", "GPA": 3.54, "WorkExp": 0.7, "TestScore": 965.0, "WritingScore": 11, "Gender": 1.0, "VolunteerLevel": 1}, {"Decision": "Admit", "State": "Florida", "GPA": 3.66, "WorkExp": 2.2, "TestScore": 967.0, "WritingScore": 91, "Gender": 0.0, "VolunteerLevel": 2}, {"Decision": "Admit", "State": "Florida", "GPA": 3.9, "WorkExp": 0.0, "TestScore": 967.0, "WritingScore": 88, "Gender": 1.0, "VolunteerLevel": 0}, {"Decision": "Admit", "State": "Florida", "GPA": 3.55, "WorkExp": 0.0, "TestScore": 962.0, "WritingScore": 97, "Gender": 0.0, "VolunteerLevel": 0}, {"Decision": "Admit", "State": "Colorado", "GPA": 3.59, "WorkExp": 1.7, "TestScore": 969.0, "WritingScore": 93, "Gender": 1.0, "VolunteerLevel": 0}, {"Decision": "Admit", "State": "California", "GPA": 3.66, "WorkExp": 0.9, "TestScore": 956.0, "WritingScore": 89, "Gender": 0.0, "VolunteerLevel": 1}, {"Decision": "Admit", "State": "Utah", "GPA": 3.78, "WorkExp": 1.2, "TestScore": 968.0, "WritingScore": 87, "Gender": 1.0, "VolunteerLevel": 2}, {"Decision": "Admit", "State": "Colorado", "GPA": 3.88, "WorkExp": 1.0, "TestScore": 969.0, "WritingScore": 93, "Gender": 0.0, "VolunteerLevel": 4}, {"Decision": "Admit", "State": "Florida", "GPA": 3.8, "WorkExp": 1.9, "TestScore": 965.0, "WritingScore": 94, "Gender": 1.0, "VolunteerLevel": 5}, {"Decision": "Admit", "State": "Florida", "GPA": 3.77, "WorkExp": 1.4, "TestScore": 969.0, "WritingScore": 99, "Gender": 0.0, "VolunteerLevel": 4}, {"Decision": "Admit", "State": "California", "GPA": 3.87, "WorkExp": 1.7, "TestScore": 966.0, "WritingScore": 97, "Gender": 1.0, "VolunteerLevel": 5}, {"Decision": "Decline", "State": "Florida", "GPA": 3.56, "WorkExp": 3.7, "TestScore": 899.0, "WritingScore": 78, "Gender": 0.0, "VolunteerLevel": 3}, {"Decision": "Decline", "State": "Florida", "GPA": 3.79, "WorkExp": 1.4, "TestScore": 867.0, "WritingScore": 77, "Gender": 1.0, "VolunteerLevel": 2}, {"Decision": "Decline", "State": "Florida", "GPA": 3.71, "WorkExp": 0.7, "TestScore": 789.0, "WritingScore": 82, "Gender": 0.0, "VolunteerLevel": 4}, {"Decision": "Decline", "State": "Florida", "GPA": 3.74, "WorkExp": 1.3, "TestScore": 800.0, "WritingScore": 56, "Gender": 1.0, "VolunteerLevel": 4}, {"Decision": "Decline", "State": "Florida", "GPA": 3.61, "WorkExp": 1.3, "TestScore": 789.0, "WritingScore": 56, "Gender": 1.0, "VolunteerLevel": 5}, {"Decision": "Decline", "State": "Florida", "GPA": 3.54, "WorkExp": 0.9, "TestScore": 765.0, "WritingScore": 78, "Gender": 1.0, "VolunteerLevel": 0}, {"Decision": "Decline", "State": "Florida", "GPA": 3.84, "WorkExp": 2.7, "TestScore": 896.0, "WritingScore": 89, "Gender": 1.0, "VolunteerLevel": 1}, {"Decision": "Decline", "State": "Florida", "GPA": 2.81, "WorkExp": 9.2, "TestScore": 764.0, "WritingScore": 56, "Gender": 0.0, "VolunteerLevel": 2}, {"Decision": "Decline", "State": "California", "GPA": 2.34, "WorkExp": 0.8, "TestScore": 754.0, "WritingScore": 76, "Gender": 1.0, "VolunteerLevel": 1}, {"Decision": "Decline", "State": "Oregon", "GPA": 2.9, "WorkExp": 0.9, "TestScore": 769.0, "WritingScore": 87, "Gender": 1.0, "VolunteerLevel": 4}, {"Decision": "Decline", "State": "Florida", "GPA": 3.33, "WorkExp": 1.6, "TestScore": 766.0, "WritingScore": 81, "Gender": 1.0, "VolunteerLevel": 5}, {"Decision": "Decline", "State": "Virginia", "GPA": 3.37, "WorkExp": 0.9, "TestScore": 766.0, "WritingScore": 79, "Gender": 0.0, "VolunteerLevel": 2}, {"Decision": "Decline", "State": "Colorado", "GPA": 3.0, "WorkExp": 1.2, "TestScore": 768.0, "WritingScore": 77, "Gender": 1.0, "VolunteerLevel": 1}, {"Decision": "Decline", "State": "Florida", "GPA": 3.1, "WorkExp": 1.9, "TestScore": 751.0, "WritingScore": 76, "Gender": 0.0, "VolunteerLevel": 0}, {"Decision": "Decline", "State": "Virginia", "GPA": 3.22, "WorkExp": 3.2, "TestScore": 769.0, "WritingScore": 75, "Gender": 0.0, "VolunteerLevel": 1}, {"Decision": "Decline", "State": "Florida", "GPA": 3.54, "WorkExp": 1.1, "TestScore": 767.0, "WritingScore": 65, "Gender": 0.0, "VolunteerLevel": 4}, {"Decision": "Decline", "State": "Colorado", "GPA": 3.44, "WorkExp": 3.2, "TestScore": 757.0, "WritingScore": 74, "Gender": 1.0, "VolunteerLevel": 3}, {"Decision": "Decline", "State": "Colorado", "GPA": 2.98, "WorkExp": 0.7, "TestScore": 763.0, "WritingScore": 71, "Gender": 0.0, "VolunteerLevel": 1}, {"Decision": "Decline", "State": "Virginia", "GPA": 2.77, "WorkExp": 3.7, "TestScore": 763.0, "WritingScore": 73, "Gender": 1.0, "VolunteerLevel": 5}, {"Decision": "Decline", "State": "Florida", "GPA": 3.18, "WorkExp": 1.4, "TestScore": 768.0, "WritingScore": 72, "Gender": 0.0, "VolunteerLevel": 0}, {"Decision": "Decline", "State": "Colorado", "GPA": 3.11, "WorkExp": 1.7, "TestScore": 758.0, "WritingScore": 69, "Gender": 1.0, "VolunteerLevel": 3}, {"Decision": "Decline", "State": "Colorado", "GPA": 3.32, "WorkExp": 1.7, "TestScore": 768.0, "WritingScore": 78, "Gender": 0.0, "VolunteerLevel": 4}, {"Decision": "Decline", "State": "Utah", "GPA": 3.01, "WorkExp": 1.4, "TestScore": 769.0, "WritingScore": 69, "Gender": 0.0, "VolunteerLevel": 2}, {"Decision": "Decline", "State": "Utah", "GPA": 3.33, "WorkExp": 0.8, "TestScore": 768.0, "WritingScore": 70, "Gender": 0.0, "VolunteerLevel": 1}, {"Decision": "Decline", "State": "Mississippi", "GPA": 2.91, "WorkExp": 6.2, "TestScore": 753.0, "WritingScore": 77, "Gender": 1.0, "VolunteerLevel": 1}, {"Decision": "Decline", "State": "Florida", "GPA": 3.56, "WorkExp": 1.7, "TestScore": 769.0, "WritingScore": 81, "Gender": 1.0, "VolunteerLevel": 4}, {"Decision": "Decline", "State": "Colorado", "GPA": 2.85, "WorkExp": 4.6, "TestScore": 762.0, "WritingScore": 75, "Gender": 1.0, "VolunteerLevel": 4}, {"Decision": "Decline", "State": "Virginia", "GPA": 3.21, "WorkExp": 1.7, "TestScore": 766.0, "WritingScore": 79, "Gender": 1.0, "VolunteerLevel": 5}, {"Decision": "Waitlist", "State": "Florida", "GPA": 3.4, "WorkExp": 1.9, "TestScore": 859.0, "WritingScore": 88, "Gender": 0.0, "VolunteerLevel": 4}, {"Decision": "Waitlist", "State": "Florida", "GPA": 3.45, "WorkExp": 4.7, "TestScore": 867.0, "WritingScore": 71, "Gender": 0.0, "VolunteerLevel": 3}, {"Decision": "Waitlist", "State": "Florida", "GPA": 3.5, "WorkExp": 1.7, "TestScore": 869.0, "WritingScore": 73, "Gender": 0.0, "VolunteerLevel": 2}, {"Decision": "Waitlist", "State": "New York", "GPA": 3.55, "WorkExp": 2.2, "TestScore": 866.0, "WritingScore": 74, "Gender": 1.0, "VolunteerLevel": 1}, {"Decision": "Waitlist", "State": "Alabama", "GPA": 3.41, "WorkExp": 1.2, "TestScore": 868.0, "WritingScore": 85, "Gender": 0.0, "VolunteerLevel": 0}, {"Decision": "Waitlist", "State": "Florida", "GPA": 3.53, "WorkExp": 1.7, "TestScore": 869.0, "WritingScore": 87, "Gender": 1.0, "VolunteerLevel": 2}, {"Decision": "Waitlist", "State": "Colorado", "GPA": 3.5, "WorkExp": 3.5, "TestScore": 869.0, "WritingScore": 83, "Gender": 0.0, "VolunteerLevel": 4}, {"Decision": "Waitlist", "State": "Utah", "GPA": 3.39, "WorkExp": 1.8, "TestScore": 866.0, "WritingScore": 82, "Gender": 1.0, "VolunteerLevel": 5}, {"Decision": "Waitlist", "State": "California", "GPA": 3.52, "WorkExp": 2.7, "TestScore": 855.0, "WritingScore": 87, "Gender": 1.0, "VolunteerLevel": 3}, {"Decision": "Waitlist", "State": "Colorado", "GPA": 3.49, "WorkExp": 1.3, "TestScore": 866.0, "WritingScore": 86, "Gender": 0.0, "VolunteerLevel": 5}, {"Decision": "Waitlist", "State": "Colorado", "GPA": 3.43, "WorkExp": 1.5, "TestScore": 869.0, "WritingScore": 85, "Gender": 1.0, "VolunteerLevel": 1}, {"Decision": "Waitlist", "State": "Florida", "GPA": 3.44, "WorkExp": 7.2, "TestScore": 865.0, "WritingScore": 84, "Gender": 0.0, "VolunteerLevel": 2}, {"Decision": "Waitlist", "State": "Florida", "GPA": 3.29, "WorkExp": 1.2, "TestScore": 869.0, "WritingScore": 83, "Gender": 1.0, "VolunteerLevel": 4}, {"Decision": "Waitlist", "State": "Utah", "GPA": 3.58, "WorkExp": 0.9, "TestScore": 864.0, "WritingScore": 82, "Gender": 1.0, "VolunteerLevel": 5}, {"Decision": "Waitlist", "State": "Utah", "GPA": 3.57, "WorkExp": 1.4, "TestScore": 869.0, "WritingScore": 80, "Gender": 1.0, "VolunteerLevel": 0}, {"Decision": "Waitlist", "State": "Florida", "GPA": 3.56, "WorkExp": 1.3, "TestScore": 869.0, "WritingScore": 84, "Gender": 1.0, "VolunteerLevel": 3}, {"Decision": "Waitlist", "State": "Florida", "GPA": 3.55, "WorkExp": 2.0, "TestScore": 853.0, "WritingScore": 81, "Gender": 0.0, "VolunteerLevel": 1}, {"Decision": "Waitlist", "State": "Colorado", "GPA": 3.54, "WorkExp": 1.2, "TestScore": 868.0, "WritingScore": 83, "Gender": 0.0, "VolunteerLevel": 2}, {"Decision": "Waitlist", "State": "Vermont", "GPA": 3.53, "WorkExp": 3.3, "TestScore": 862.0, "WritingScore": 85, "Gender": 1.0, "VolunteerLevel": 1}, {"Decision": "Waitlist", "State": "Florida", "GPA": 3.52, "WorkExp": 0.7, "TestScore": 868.0, "WritingScore": 81, "Gender": 0.0, "VolunteerLevel": 4}, {"Decision": "Waitlist", "State": "Florida", "GPA": 3.51, "WorkExp": 3.4, "TestScore": 865.0, "WritingScore": 88, "Gender": 1.0, "VolunteerLevel": 3}, {"Decision": "Waitlist", "State": "California", "GPA": 3.47, "WorkExp": 2.2, "TestScore": 867.0, "WritingScore": 77, "Gender": 1.0, "VolunteerLevel": 5}, {"Decision": "Waitlist", "State": "Florida", "GPA": 3.46, "WorkExp": 1.9, "TestScore": 869.0, "WritingScore": 89, "Gender": 1.0, "VolunteerLevel": 0}]}}, {"mode": "vega-lite"});
+</script>
+</div>
+</div>
+<div class="cell" data-execution_count="32">
+<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a>custom_palette <span class="op">=</span> [<span class="st">'#00072D'</span>, <span class="st">'#0A2472'</span>, <span class="st">'#0E6BA8'</span>, <span class="st">'#A6E1FA'</span>, <span class="st">'#99ABC5'</span>, <span class="st">'#8B748F'</span>, <span class="st">'#6F0624'</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell" data-execution_count="33">
+<div class="sourceCode cell-code" id="cb27"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a>scatter_cols <span class="op">=</span> df[[<span class="st">'State'</span>, <span class="st">'Decision'</span>, <span class="st">'GPA'</span>, <span class="st">'WritingScore'</span>, <span class="st">'TestScore'</span>]]</span>
+<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a>tri_color <span class="op">=</span> [custom_palette[<span class="dv">0</span>], custom_palette[<span class="dv">2</span>], custom_palette[<span class="dv">6</span>]]</span>
+<span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a>g <span class="op">=</span> sns.pairplot(scatter_cols, hue<span class="op">=</span><span class="st">'Decision'</span>, palette<span class="op">=</span>tri_color, corner<span class="op">=</span><span class="va">True</span>, height<span class="op">=</span><span class="fl">1.5</span>)</span>
+<span id="cb27-4"><a href="#cb27-4" aria-hidden="true" tabindex="-1"></a>g.fig.suptitle(<span class="st">'Pairplot of GPA, Writing Score, and Test Score by Decision'</span>)</span>
+<span id="cb27-5"><a href="#cb27-5" aria-hidden="true" tabindex="-1"></a>plt.savefig(<span class="st">"../website/images/decision_pairplot.png"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<p><img src="eda_files/figure-html/cell-21-output-1.png" class="img-fluid"></p>
+</div>
+</div>
+</section>
+<section id="maps" class="level2">
+<h2 class="anchored" data-anchor-id="maps">Maps</h2>
+<div class="cell" data-execution_count="34">
+<div class="sourceCode cell-code" id="cb28"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a><span class="co">#calculate averages of all numeric columns</span></span>
+<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a>num_cols <span class="op">=</span> df[[<span class="st">'State'</span>, <span class="st">'GPA'</span>, <span class="st">'WorkExp'</span>, <span class="st">'TestScore'</span>, <span class="st">'WritingScore'</span>, <span class="st">'VolunteerLevel'</span>]]</span>
+<span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a>avg_df <span class="op">=</span> num_cols.groupby(<span class="st">'State'</span>).mean().reset_index()</span>
+<span id="cb28-4"><a href="#cb28-4" aria-hidden="true" tabindex="-1"></a>state_abbr <span class="op">=</span> {</span>
+<span id="cb28-5"><a href="#cb28-5" aria-hidden="true" tabindex="-1"></a>    <span class="st">'Alabama'</span>: <span class="st">'AL'</span>,</span>
+<span id="cb28-6"><a href="#cb28-6" aria-hidden="true" tabindex="-1"></a>    <span class="st">'California'</span>: <span class="st">'CA'</span>,</span>
+<span id="cb28-7"><a href="#cb28-7" aria-hidden="true" tabindex="-1"></a>    <span class="st">'Colorado'</span>: <span class="st">'CO'</span>,</span>
+<span id="cb28-8"><a href="#cb28-8" aria-hidden="true" tabindex="-1"></a>    <span class="st">'Florida'</span>: <span class="st">'FL'</span>,</span>
+<span id="cb28-9"><a href="#cb28-9" aria-hidden="true" tabindex="-1"></a>    <span class="st">'Georgia'</span>: <span class="st">'GA'</span>,</span>
+<span id="cb28-10"><a href="#cb28-10" aria-hidden="true" tabindex="-1"></a>    <span class="st">'Mississippi'</span>: <span class="st">'MS'</span>,</span>
+<span id="cb28-11"><a href="#cb28-11" aria-hidden="true" tabindex="-1"></a>    <span class="st">'New York'</span>: <span class="st">'NY'</span>,</span>
+<span id="cb28-12"><a href="#cb28-12" aria-hidden="true" tabindex="-1"></a>    <span class="st">'Oregon'</span>: <span class="st">'OR'</span>,</span>
+<span id="cb28-13"><a href="#cb28-13" aria-hidden="true" tabindex="-1"></a>    <span class="st">'Utah'</span>: <span class="st">'UT'</span>,</span>
+<span id="cb28-14"><a href="#cb28-14" aria-hidden="true" tabindex="-1"></a>    <span class="st">'Vermont'</span>: <span class="st">'VT'</span>,</span>
+<span id="cb28-15"><a href="#cb28-15" aria-hidden="true" tabindex="-1"></a>    <span class="st">'Virginia'</span>: <span class="st">'VA'</span></span>
+<span id="cb28-16"><a href="#cb28-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-17"><a href="#cb28-17" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb28-18"><a href="#cb28-18" aria-hidden="true" tabindex="-1"></a>avg_df[<span class="st">'State_Abbr'</span>] <span class="op">=</span> avg_df[<span class="st">'State'</span>].<span class="bu">map</span>(state_abbr)</span>
+<span id="cb28-19"><a href="#cb28-19" aria-hidden="true" tabindex="-1"></a>avg_df <span class="op">=</span> avg_df.drop(columns<span class="op">=</span>[<span class="st">'State'</span>])</span>
+<span id="cb28-20"><a href="#cb28-20" aria-hidden="true" tabindex="-1"></a>avg_df <span class="op">=</span> avg_df.rename(columns<span class="op">=</span>{<span class="st">'State_Abbr'</span>: <span class="st">'State'</span>})</span>
+<span id="cb28-21"><a href="#cb28-21" aria-hidden="true" tabindex="-1"></a>avg_df</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="34">
+<div>
+
+
+<table class="dataframe table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">GPA</th>
+<th data-quarto-table-cell-role="th">WorkExp</th>
+<th data-quarto-table-cell-role="th">TestScore</th>
+<th data-quarto-table-cell-role="th">WritingScore</th>
+<th data-quarto-table-cell-role="th">VolunteerLevel</th>
+<th data-quarto-table-cell-role="th">State</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">0</td>
+<td>3.410000</td>
+<td>1.200000</td>
+<td>868.000000</td>
+<td>85.000000</td>
+<td>0.000000</td>
+<td>AL</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">1</td>
+<td>3.600833</td>
+<td>2.808333</td>
+<td>916.166667</td>
+<td>90.833333</td>
+<td>2.666667</td>
+<td>CA</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">2</td>
+<td>3.467222</td>
+<td>1.844444</td>
+<td>877.055556</td>
+<td>80.000000</td>
+<td>2.444444</td>
+<td>CO</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">3</td>
+<td>3.559143</td>
+<td>2.117143</td>
+<td>872.571429</td>
+<td>80.428571</td>
+<td>2.457143</td>
+<td>FL</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">4</td>
+<td>2.910000</td>
+<td>6.200000</td>
+<td>753.000000</td>
+<td>77.000000</td>
+<td>1.000000</td>
+<td>MS</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">5</td>
+<td>3.550000</td>
+<td>2.200000</td>
+<td>866.000000</td>
+<td>74.000000</td>
+<td>1.000000</td>
+<td>NY</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">6</td>
+<td>2.900000</td>
+<td>0.900000</td>
+<td>769.000000</td>
+<td>87.000000</td>
+<td>4.000000</td>
+<td>OR</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">7</td>
+<td>3.443333</td>
+<td>1.250000</td>
+<td>850.666667</td>
+<td>78.333333</td>
+<td>2.500000</td>
+<td>UT</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">8</td>
+<td>3.530000</td>
+<td>3.300000</td>
+<td>862.000000</td>
+<td>85.000000</td>
+<td>1.000000</td>
+<td>VT</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">9</td>
+<td>3.142500</td>
+<td>2.375000</td>
+<td>766.000000</td>
+<td>76.500000</td>
+<td>3.250000</td>
+<td>VA</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+<div class="cell" data-execution_count="35">
+<div class="sourceCode cell-code" id="cb29"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> plotly.express <span class="im">as</span> px</span>
+<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-3"><a href="#cb29-3" aria-hidden="true" tabindex="-1"></a>fig <span class="op">=</span> px.choropleth(avg_df, locationmode<span class="op">=</span><span class="st">"USA-states"</span>, </span>
+<span id="cb29-4"><a href="#cb29-4" aria-hidden="true" tabindex="-1"></a>                    locations<span class="op">=</span>avg_df[<span class="st">'State'</span>], </span>
+<span id="cb29-5"><a href="#cb29-5" aria-hidden="true" tabindex="-1"></a>                    scope<span class="op">=</span><span class="st">"usa"</span>,</span>
+<span id="cb29-6"><a href="#cb29-6" aria-hidden="true" tabindex="-1"></a>                    color<span class="op">=</span>avg_df[<span class="st">'GPA'</span>],</span>
+<span id="cb29-7"><a href="#cb29-7" aria-hidden="true" tabindex="-1"></a>                    hover_data<span class="op">=</span>{<span class="st">"State"</span>: <span class="va">True</span>, <span class="st">"GPA"</span>: <span class="va">True</span>},  </span>
+<span id="cb29-8"><a href="#cb29-8" aria-hidden="true" tabindex="-1"></a>                    labels<span class="op">=</span>{<span class="st">"GPA"</span>: <span class="st">"Selected Variable"</span>},</span>
+<span id="cb29-9"><a href="#cb29-9" aria-hidden="true" tabindex="-1"></a>                    color_continuous_scale<span class="op">=</span>custom_palette</span>
+<span id="cb29-10"><a href="#cb29-10" aria-hidden="true" tabindex="-1"></a>                )</span>
+<span id="cb29-11"><a href="#cb29-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-12"><a href="#cb29-12" aria-hidden="true" tabindex="-1"></a>dropdown <span class="op">=</span> []</span>
+<span id="cb29-13"><a href="#cb29-13" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> col <span class="kw">in</span> avg_df.columns[:<span class="op">-</span><span class="dv">1</span>]:</span>
+<span id="cb29-14"><a href="#cb29-14" aria-hidden="true" tabindex="-1"></a>    dropdown.append({<span class="st">'label'</span>: col, <span class="st">'method'</span>: <span class="st">'update'</span>, <span class="st">'args'</span>: [{<span class="st">'z'</span>: [avg_df[col]]}]})</span>
+<span id="cb29-15"><a href="#cb29-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-16"><a href="#cb29-16" aria-hidden="true" tabindex="-1"></a>fig.update_layout(updatemenus<span class="op">=</span>[{<span class="st">'buttons'</span>: dropdown, <span class="st">'direction'</span>: <span class="st">'down'</span>, <span class="st">'showactive'</span>: <span class="va">True</span>}],</span>
+<span id="cb29-17"><a href="#cb29-17" aria-hidden="true" tabindex="-1"></a>                  title<span class="op">=</span><span class="st">'Choropleth Map of Average Selected Variable'</span>)</span>
+<span id="cb29-18"><a href="#cb29-18" aria-hidden="true" tabindex="-1"></a>fig.update_coloraxes(colorbar_title<span class="op">=</span><span class="bu">dict</span>(text<span class="op">=</span><span class="st">'Selected Variable'</span>))</span>
+<span id="cb29-19"><a href="#cb29-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-20"><a href="#cb29-20" aria-hidden="true" tabindex="-1"></a>fig.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<pre><code>Unable to display output for mime type(s): application/vnd.plotly.v1+json</code></pre>
+</div>
+</div>
+<div class="cell" data-execution_count="45">
+<div class="sourceCode cell-code" id="cb31"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> plotly.express <span class="im">as</span> px</span>
+<span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb31-3"><a href="#cb31-3" aria-hidden="true" tabindex="-1"></a>admit <span class="op">=</span> df[df[<span class="st">'Decision'</span>] <span class="op">==</span> <span class="st">'Admit'</span>]</span>
+<span id="cb31-4"><a href="#cb31-4" aria-hidden="true" tabindex="-1"></a>num_cols <span class="op">=</span> admit[[<span class="st">'State'</span>, <span class="st">'GPA'</span>, <span class="st">'WorkExp'</span>, <span class="st">'TestScore'</span>, <span class="st">'WritingScore'</span>, <span class="st">'VolunteerLevel'</span>]]</span>
+<span id="cb31-5"><a href="#cb31-5" aria-hidden="true" tabindex="-1"></a>avg_admit <span class="op">=</span> num_cols.groupby(<span class="st">'State'</span>).mean().reset_index()</span>
+<span id="cb31-6"><a href="#cb31-6" aria-hidden="true" tabindex="-1"></a>avg_admit[<span class="st">'State_Abbr'</span>] <span class="op">=</span> avg_admit[<span class="st">'State'</span>].<span class="bu">map</span>(state_abbr)</span>
+<span id="cb31-7"><a href="#cb31-7" aria-hidden="true" tabindex="-1"></a><span class="co">#avg_admit = avg_admit.drop(columns=['State'])</span></span>
+<span id="cb31-8"><a href="#cb31-8" aria-hidden="true" tabindex="-1"></a><span class="co">#avg_admit = avg_admit.rename(columns={'State_Abbr': 'State'})</span></span>
+<span id="cb31-9"><a href="#cb31-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb31-10"><a href="#cb31-10" aria-hidden="true" tabindex="-1"></a>fig <span class="op">=</span> px.choropleth(avg_admit, locationmode<span class="op">=</span><span class="st">"USA-states"</span>, </span>
+<span id="cb31-11"><a href="#cb31-11" aria-hidden="true" tabindex="-1"></a>                    locations<span class="op">=</span>avg_admit[<span class="st">'State_Abbr'</span>], </span>
+<span id="cb31-12"><a href="#cb31-12" aria-hidden="true" tabindex="-1"></a>                    scope<span class="op">=</span><span class="st">"usa"</span>,</span>
+<span id="cb31-13"><a href="#cb31-13" aria-hidden="true" tabindex="-1"></a>                    color<span class="op">=</span>avg_admit[<span class="st">'GPA'</span>],</span>
+<span id="cb31-14"><a href="#cb31-14" aria-hidden="true" tabindex="-1"></a>                    hover_data<span class="op">=</span>{<span class="st">"State_Abbr"</span>: <span class="va">True</span>, <span class="st">"GPA"</span>: <span class="va">True</span>},  </span>
+<span id="cb31-15"><a href="#cb31-15" aria-hidden="true" tabindex="-1"></a>                    labels<span class="op">=</span>{<span class="st">"GPA"</span>: <span class="st">"Selected Variable"</span>},</span>
+<span id="cb31-16"><a href="#cb31-16" aria-hidden="true" tabindex="-1"></a>                    color_continuous_scale<span class="op">=</span>custom_palette</span>
+<span id="cb31-17"><a href="#cb31-17" aria-hidden="true" tabindex="-1"></a>                )</span>
+<span id="cb31-18"><a href="#cb31-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb31-19"><a href="#cb31-19" aria-hidden="true" tabindex="-1"></a>dropdown <span class="op">=</span> []</span>
+<span id="cb31-20"><a href="#cb31-20" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> col <span class="kw">in</span> avg_admit.columns[:<span class="op">-</span><span class="dv">1</span>]:</span>
+<span id="cb31-21"><a href="#cb31-21" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> col <span class="op">!=</span> <span class="st">'State'</span>:</span>
+<span id="cb31-22"><a href="#cb31-22" aria-hidden="true" tabindex="-1"></a>        dropdown.append({<span class="st">'label'</span>: col, <span class="st">'method'</span>: <span class="st">'update'</span>, <span class="st">'args'</span>: [{<span class="st">'z'</span>: [avg_admit[col]]}]})</span>
+<span id="cb31-23"><a href="#cb31-23" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb31-24"><a href="#cb31-24" aria-hidden="true" tabindex="-1"></a>fig.update_layout(updatemenus<span class="op">=</span>[{<span class="st">'buttons'</span>: dropdown, <span class="st">'direction'</span>: <span class="st">'down'</span>, <span class="st">'showactive'</span>: <span class="va">True</span>}],</span>
+<span id="cb31-25"><a href="#cb31-25" aria-hidden="true" tabindex="-1"></a>                  title<span class="op">=</span><span class="st">'Choropleth Map of Average Selected Variable for Admitted Students'</span>)</span>
+<span id="cb31-26"><a href="#cb31-26" aria-hidden="true" tabindex="-1"></a>fig.update_coloraxes(colorbar_title<span class="op">=</span><span class="bu">dict</span>(text<span class="op">=</span><span class="st">'Selected Variable'</span>))</span>
+<span id="cb31-27"><a href="#cb31-27" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb31-28"><a href="#cb31-28" aria-hidden="true" tabindex="-1"></a>fig.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<pre><code>Unable to display output for mime type(s): application/vnd.plotly.v1+json</code></pre>
+</div>
+</div>
+<div class="cell" data-execution_count="46">
+<div class="sourceCode cell-code" id="cb33"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> plotly.express <span class="im">as</span> px</span>
+<span id="cb33-2"><a href="#cb33-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb33-3"><a href="#cb33-3" aria-hidden="true" tabindex="-1"></a>decline <span class="op">=</span> df[df[<span class="st">'Decision'</span>] <span class="op">==</span> <span class="st">'Decline'</span>]</span>
+<span id="cb33-4"><a href="#cb33-4" aria-hidden="true" tabindex="-1"></a>num_cols <span class="op">=</span> decline[[<span class="st">'State'</span>, <span class="st">'GPA'</span>, <span class="st">'WorkExp'</span>, <span class="st">'TestScore'</span>, <span class="st">'WritingScore'</span>, <span class="st">'VolunteerLevel'</span>]]</span>
+<span id="cb33-5"><a href="#cb33-5" aria-hidden="true" tabindex="-1"></a>avg_decline <span class="op">=</span> num_cols.groupby(<span class="st">'State'</span>).mean().reset_index()</span>
+<span id="cb33-6"><a href="#cb33-6" aria-hidden="true" tabindex="-1"></a>avg_decline[<span class="st">'State_Abbr'</span>] <span class="op">=</span> avg_decline[<span class="st">'State'</span>].<span class="bu">map</span>(state_abbr)</span>
+<span id="cb33-7"><a href="#cb33-7" aria-hidden="true" tabindex="-1"></a><span class="co"># avg_decline = avg_decline.drop(columns=['State'])</span></span>
+<span id="cb33-8"><a href="#cb33-8" aria-hidden="true" tabindex="-1"></a><span class="co"># avg_decline = avg_decline.rename(columns={'State_Abbr': 'State'})</span></span>
+<span id="cb33-9"><a href="#cb33-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb33-10"><a href="#cb33-10" aria-hidden="true" tabindex="-1"></a>fig <span class="op">=</span> px.choropleth(avg_decline, locationmode<span class="op">=</span><span class="st">"USA-states"</span>, </span>
+<span id="cb33-11"><a href="#cb33-11" aria-hidden="true" tabindex="-1"></a>                    locations<span class="op">=</span>avg_decline[<span class="st">'State_Abbr'</span>], </span>
+<span id="cb33-12"><a href="#cb33-12" aria-hidden="true" tabindex="-1"></a>                    scope<span class="op">=</span><span class="st">"usa"</span>,</span>
+<span id="cb33-13"><a href="#cb33-13" aria-hidden="true" tabindex="-1"></a>                    color<span class="op">=</span>avg_decline[<span class="st">'GPA'</span>],</span>
+<span id="cb33-14"><a href="#cb33-14" aria-hidden="true" tabindex="-1"></a>                    hover_data<span class="op">=</span>{<span class="st">"State_Abbr"</span>: <span class="va">True</span>, <span class="st">"GPA"</span>: <span class="va">True</span>},  </span>
+<span id="cb33-15"><a href="#cb33-15" aria-hidden="true" tabindex="-1"></a>                    labels<span class="op">=</span>{<span class="st">"GPA"</span>: <span class="st">"Selected Variable"</span>},</span>
+<span id="cb33-16"><a href="#cb33-16" aria-hidden="true" tabindex="-1"></a>                    color_continuous_scale<span class="op">=</span>custom_palette</span>
+<span id="cb33-17"><a href="#cb33-17" aria-hidden="true" tabindex="-1"></a>                )</span>
+<span id="cb33-18"><a href="#cb33-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb33-19"><a href="#cb33-19" aria-hidden="true" tabindex="-1"></a>dropdown <span class="op">=</span> []</span>
+<span id="cb33-20"><a href="#cb33-20" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> col <span class="kw">in</span> avg_decline.columns[:<span class="op">-</span><span class="dv">1</span>]:</span>
+<span id="cb33-21"><a href="#cb33-21" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> col <span class="op">!=</span> <span class="st">'State'</span>:</span>
+<span id="cb33-22"><a href="#cb33-22" aria-hidden="true" tabindex="-1"></a>        dropdown.append({<span class="st">'label'</span>: col, <span class="st">'method'</span>: <span class="st">'update'</span>, <span class="st">'args'</span>: [{<span class="st">'z'</span>: [avg_decline[col]]}]})</span>
+<span id="cb33-23"><a href="#cb33-23" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb33-24"><a href="#cb33-24" aria-hidden="true" tabindex="-1"></a>fig.update_layout(updatemenus<span class="op">=</span>[{<span class="st">'buttons'</span>: dropdown, <span class="st">'direction'</span>: <span class="st">'down'</span>, <span class="st">'showactive'</span>: <span class="va">True</span>}],</span>
+<span id="cb33-25"><a href="#cb33-25" aria-hidden="true" tabindex="-1"></a>                  title<span class="op">=</span><span class="st">'Choropleth Map of Average Selected Variable for Declined Students'</span>)</span>
+<span id="cb33-26"><a href="#cb33-26" aria-hidden="true" tabindex="-1"></a>fig.update_coloraxes(colorbar_title<span class="op">=</span><span class="bu">dict</span>(text<span class="op">=</span><span class="st">'Selected Variable'</span>))</span>
+<span id="cb33-27"><a href="#cb33-27" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb33-28"><a href="#cb33-28" aria-hidden="true" tabindex="-1"></a>fig.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<pre><code>Unable to display output for mime type(s): application/vnd.plotly.v1+json</code></pre>
+</div>
+</div>
+<div class="cell" data-execution_count="50">
+<div class="sourceCode cell-code" id="cb35"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> vega_datasets <span class="im">import</span> data</span>
+<span id="cb35-2"><a href="#cb35-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-3"><a href="#cb35-3" aria-hidden="true" tabindex="-1"></a>state_id_dict <span class="op">=</span> <span class="bu">dict</span>(<span class="bu">zip</span>(data.population_engineers_hurricanes()[<span class="st">"state"</span>], data.population_engineers_hurricanes()[<span class="st">"id"</span>]))</span>
+<span id="cb35-4"><a href="#cb35-4" aria-hidden="true" tabindex="-1"></a>avg_admit[<span class="st">"StateID"</span>] <span class="op">=</span> avg_admit[<span class="st">"State"</span>].<span class="bu">map</span>(state_id_dict)</span>
+<span id="cb35-5"><a href="#cb35-5" aria-hidden="true" tabindex="-1"></a>avg_decline[<span class="st">"StateID"</span>] <span class="op">=</span> avg_decline[<span class="st">"State"</span>].<span class="bu">map</span>(state_id_dict)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell" data-execution_count="69">
+<div class="sourceCode cell-code" id="cb36"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> altair <span class="im">as</span> alt</span>
+<span id="cb36-2"><a href="#cb36-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> vega_datasets <span class="im">import</span> data</span>
+<span id="cb36-3"><a href="#cb36-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb36-4"><a href="#cb36-4" aria-hidden="true" tabindex="-1"></a>states <span class="op">=</span> alt.topo_feature(<span class="st">'https://raw.githubusercontent.com/vega/vega-datasets/master/data/us-10m.json'</span>, <span class="st">'states'</span>)</span>
+<span id="cb36-5"><a href="#cb36-5" aria-hidden="true" tabindex="-1"></a>click <span class="op">=</span> alt.selection_multi(fields <span class="op">=</span> [<span class="st">"State"</span>])</span>
+<span id="cb36-6"><a href="#cb36-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb36-7"><a href="#cb36-7" aria-hidden="true" tabindex="-1"></a>state_id_dict <span class="op">=</span> <span class="bu">dict</span>(<span class="bu">zip</span>(data.population_engineers_hurricanes()[<span class="st">"state"</span>], data.population_engineers_hurricanes()[<span class="st">"id"</span>]))</span>
+<span id="cb36-8"><a href="#cb36-8" aria-hidden="true" tabindex="-1"></a>avg_admit[<span class="st">"StateID"</span>] <span class="op">=</span> avg_admit[<span class="st">"State"</span>].<span class="bu">map</span>(state_id_dict)</span>
+<span id="cb36-9"><a href="#cb36-9" aria-hidden="true" tabindex="-1"></a>avg_decline[<span class="st">"StateID"</span>] <span class="op">=</span> avg_decline[<span class="st">"State"</span>].<span class="bu">map</span>(state_id_dict)</span>
+<span id="cb36-10"><a href="#cb36-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb36-11"><a href="#cb36-11" aria-hidden="true" tabindex="-1"></a>existing_states <span class="op">=</span> alt.Chart(states).mark_geoshape(stroke<span class="op">=</span><span class="st">'black'</span>).encode(</span>
+<span id="cb36-12"><a href="#cb36-12" aria-hidden="true" tabindex="-1"></a>    color <span class="op">=</span> alt.Color(<span class="st">"GPA:Q"</span>, scale<span class="op">=</span>alt.Scale(<span class="bu">range</span><span class="op">=</span>custom_palette)),</span>
+<span id="cb36-13"><a href="#cb36-13" aria-hidden="true" tabindex="-1"></a>    tooltip <span class="op">=</span> [<span class="st">"State:N"</span>, <span class="st">"GPA:Q"</span>],</span>
+<span id="cb36-14"><a href="#cb36-14" aria-hidden="true" tabindex="-1"></a>    opacity <span class="op">=</span> alt.condition(<span class="st">'isValid(datum.GPA)'</span>, alt.value(<span class="dv">1</span>), alt.value(<span class="fl">0.2</span>)),</span>
+<span id="cb36-15"><a href="#cb36-15" aria-hidden="true" tabindex="-1"></a>).transform_lookup(</span>
+<span id="cb36-16"><a href="#cb36-16" aria-hidden="true" tabindex="-1"></a>    lookup <span class="op">=</span> <span class="st">"id"</span>,</span>
+<span id="cb36-17"><a href="#cb36-17" aria-hidden="true" tabindex="-1"></a>    from_ <span class="op">=</span> alt.LookupData(avg_admit, <span class="st">"StateID"</span>, <span class="bu">list</span>(avg_admit.columns))</span>
+<span id="cb36-18"><a href="#cb36-18" aria-hidden="true" tabindex="-1"></a>).properties(width <span class="op">=</span> <span class="dv">333</span>, height <span class="op">=</span> <span class="dv">200</span>, title<span class="op">=</span><span class="st">"Average Admitted GPA by State"</span>).add_selection(click).project(<span class="bu">type</span> <span class="op">=</span> <span class="st">"albersUsa"</span>).interactive()</span>
+<span id="cb36-19"><a href="#cb36-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb36-20"><a href="#cb36-20" aria-hidden="true" tabindex="-1"></a>missing_states <span class="op">=</span> (</span>
+<span id="cb36-21"><a href="#cb36-21" aria-hidden="true" tabindex="-1"></a>    alt.Chart(states)</span>
+<span id="cb36-22"><a href="#cb36-22" aria-hidden="true" tabindex="-1"></a>    .mark_geoshape(fill <span class="op">=</span> <span class="st">"grey"</span>, stroke <span class="op">=</span> <span class="st">"white"</span>)</span>
+<span id="cb36-23"><a href="#cb36-23" aria-hidden="true" tabindex="-1"></a>    .encode(opacity<span class="op">=</span>alt.condition(<span class="st">"isValid(datum.GPA)"</span>, alt.value(<span class="dv">0</span>), alt.value(<span class="fl">0.2</span>))).add_selection(click).project(<span class="bu">type</span> <span class="op">=</span> <span class="st">"albersUsa"</span>)</span>
+<span id="cb36-24"><a href="#cb36-24" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb36-25"><a href="#cb36-25" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb36-26"><a href="#cb36-26" aria-hidden="true" tabindex="-1"></a>admit_map <span class="op">=</span> existing_states <span class="op">+</span> missing_states</span>
+<span id="cb36-27"><a href="#cb36-27" aria-hidden="true" tabindex="-1"></a>admit_map <span class="op">=</span> admit_map.encode(</span>
+<span id="cb36-28"><a href="#cb36-28" aria-hidden="true" tabindex="-1"></a>    tooltip<span class="op">=</span> [<span class="st">"State:N"</span>, <span class="st">"GPA:Q"</span>]</span>
+<span id="cb36-29"><a href="#cb36-29" aria-hidden="true" tabindex="-1"></a>    ).transform_lookup(</span>
+<span id="cb36-30"><a href="#cb36-30" aria-hidden="true" tabindex="-1"></a>        lookup<span class="op">=</span><span class="st">"id"</span>,</span>
+<span id="cb36-31"><a href="#cb36-31" aria-hidden="true" tabindex="-1"></a>        from_<span class="op">=</span>alt.LookupData(avg_admit, <span class="st">"StateID"</span>, <span class="bu">list</span>(avg_admit.columns))</span>
+<span id="cb36-32"><a href="#cb36-32" aria-hidden="true" tabindex="-1"></a>    ).interactive()</span>
+<span id="cb36-33"><a href="#cb36-33" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb36-34"><a href="#cb36-34" aria-hidden="true" tabindex="-1"></a>existing_states <span class="op">=</span> alt.Chart(states).mark_geoshape(stroke<span class="op">=</span><span class="st">'black'</span>).encode(</span>
+<span id="cb36-35"><a href="#cb36-35" aria-hidden="true" tabindex="-1"></a>    color <span class="op">=</span> alt.Color(<span class="st">"GPA:Q"</span>, scale<span class="op">=</span>alt.Scale(<span class="bu">range</span><span class="op">=</span>custom_palette)),</span>
+<span id="cb36-36"><a href="#cb36-36" aria-hidden="true" tabindex="-1"></a>    tooltip <span class="op">=</span> [<span class="st">"State:N"</span>, <span class="st">"GPA:Q"</span>],</span>
+<span id="cb36-37"><a href="#cb36-37" aria-hidden="true" tabindex="-1"></a>    opacity <span class="op">=</span> alt.condition(<span class="st">'isValid(datum.GPA)'</span>, alt.value(<span class="dv">1</span>), alt.value(<span class="fl">0.2</span>)),</span>
+<span id="cb36-38"><a href="#cb36-38" aria-hidden="true" tabindex="-1"></a>).transform_lookup(</span>
+<span id="cb36-39"><a href="#cb36-39" aria-hidden="true" tabindex="-1"></a>    lookup <span class="op">=</span> <span class="st">"id"</span>,</span>
+<span id="cb36-40"><a href="#cb36-40" aria-hidden="true" tabindex="-1"></a>    from_ <span class="op">=</span> alt.LookupData(avg_decline, <span class="st">"StateID"</span>, <span class="bu">list</span>(avg_decline.columns))</span>
+<span id="cb36-41"><a href="#cb36-41" aria-hidden="true" tabindex="-1"></a>).properties(width <span class="op">=</span> <span class="dv">333</span>, height <span class="op">=</span> <span class="dv">200</span>, title<span class="op">=</span><span class="st">"Average Declined GPA by State"</span>).add_selection(click).project(<span class="bu">type</span> <span class="op">=</span> <span class="st">"albersUsa"</span>).interactive()</span>
+<span id="cb36-42"><a href="#cb36-42" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb36-43"><a href="#cb36-43" aria-hidden="true" tabindex="-1"></a>missing_states <span class="op">=</span> (</span>
+<span id="cb36-44"><a href="#cb36-44" aria-hidden="true" tabindex="-1"></a>    alt.Chart(states)</span>
+<span id="cb36-45"><a href="#cb36-45" aria-hidden="true" tabindex="-1"></a>    .mark_geoshape(fill <span class="op">=</span> <span class="st">"grey"</span>, stroke <span class="op">=</span> <span class="st">"white"</span>)</span>
+<span id="cb36-46"><a href="#cb36-46" aria-hidden="true" tabindex="-1"></a>    .encode(opacity<span class="op">=</span>alt.condition(<span class="st">"isValid(datum.GPA)"</span>, alt.value(<span class="dv">0</span>), alt.value(<span class="fl">0.2</span>))).add_selection(click).project(<span class="bu">type</span> <span class="op">=</span> <span class="st">"albersUsa"</span>)</span>
+<span id="cb36-47"><a href="#cb36-47" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb36-48"><a href="#cb36-48" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb36-49"><a href="#cb36-49" aria-hidden="true" tabindex="-1"></a>decline_map <span class="op">=</span> existing_states <span class="op">+</span> missing_states</span>
+<span id="cb36-50"><a href="#cb36-50" aria-hidden="true" tabindex="-1"></a>decline_map <span class="op">=</span> decline_map.encode(</span>
+<span id="cb36-51"><a href="#cb36-51" aria-hidden="true" tabindex="-1"></a>    tooltip<span class="op">=</span> [<span class="st">"State:N"</span>, <span class="st">"GPA:Q"</span>]</span>
+<span id="cb36-52"><a href="#cb36-52" aria-hidden="true" tabindex="-1"></a>    ).transform_lookup(</span>
+<span id="cb36-53"><a href="#cb36-53" aria-hidden="true" tabindex="-1"></a>        lookup<span class="op">=</span><span class="st">"id"</span>,</span>
+<span id="cb36-54"><a href="#cb36-54" aria-hidden="true" tabindex="-1"></a>        from_<span class="op">=</span>alt.LookupData(avg_decline, <span class="st">"StateID"</span>, <span class="bu">list</span>(avg_decline.columns))</span>
+<span id="cb36-55"><a href="#cb36-55" aria-hidden="true" tabindex="-1"></a>    ).interactive()</span>
+<span id="cb36-56"><a href="#cb36-56" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb36-57"><a href="#cb36-57" aria-hidden="true" tabindex="-1"></a>admit_map <span class="op">|</span> decline_map</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>c:\Users\theda\anaconda3\Lib\site-packages\altair\utils\deprecation.py:65: AltairDeprecationWarning:
+
+'selection_multi' is deprecated.  Use 'selection_point'
+
+c:\Users\theda\anaconda3\Lib\site-packages\altair\utils\deprecation.py:65: AltairDeprecationWarning:
+
+'add_selection' is deprecated. Use 'add_params' instead.
+</code></pre>
+</div>
+<div class="cell-output cell-output-display" data-execution_count="69">
+
+<style>
+  #altair-viz-685f3b4711b7461c9dc5a1de1ef91f43.vega-embed {
+    width: 100%;
+    display: flex;
+  }
+
+  #altair-viz-685f3b4711b7461c9dc5a1de1ef91f43.vega-embed details,
+  #altair-viz-685f3b4711b7461c9dc5a1de1ef91f43.vega-embed details summary {
+    position: relative;
+  }
+</style>
+<div id="altair-viz-685f3b4711b7461c9dc5a1de1ef91f43"></div>
+<script type="text/javascript">
+  var VEGA_DEBUG = (typeof VEGA_DEBUG == "undefined") ? {} : VEGA_DEBUG;
+  (function(spec, embedOpt){
+    let outputDiv = document.currentScript.previousElementSibling;
+    if (outputDiv.id !== "altair-viz-685f3b4711b7461c9dc5a1de1ef91f43") {
+      outputDiv = document.getElementById("altair-viz-685f3b4711b7461c9dc5a1de1ef91f43");
+    }
+    const paths = {
+      "vega": "https://cdn.jsdelivr.net/npm/vega@5?noext",
+      "vega-lib": "https://cdn.jsdelivr.net/npm/vega-lib?noext",
+      "vega-lite": "https://cdn.jsdelivr.net/npm/vega-lite@5.8.0?noext",
+      "vega-embed": "https://cdn.jsdelivr.net/npm/vega-embed@6?noext",
+    };
+
+    function maybeLoadScript(lib, version) {
+      var key = `${lib.replace("-", "")}_version`;
+      return (VEGA_DEBUG[key] == version) ?
+        Promise.resolve(paths[lib]) :
+        new Promise(function(resolve, reject) {
+          var s = document.createElement('script');
+          document.getElementsByTagName("head")[0].appendChild(s);
+          s.async = true;
+          s.onload = () => {
+            VEGA_DEBUG[key] = version;
+            return resolve(paths[lib]);
+          };
+          s.onerror = () => reject(`Error loading script: ${paths[lib]}`);
+          s.src = paths[lib];
+        });
+    }
+
+    function showError(err) {
+      outputDiv.innerHTML = `<div class="error" style="color:red;">${err}</div>`;
+      throw err;
+    }
+
+    function displayChart(vegaEmbed) {
+      vegaEmbed(outputDiv, spec, embedOpt)
+        .catch(err => showError(`Javascript Error: ${err.message}<br>This usually means there's a typo in your chart specification. See the javascript console for the full traceback.`));
+    }
+
+    if(typeof define === "function" && define.amd) {
+      requirejs.config({paths});
+      require(["vega-embed"], displayChart, err => showError(`Error loading script: ${err.message}`));
+    } else {
+      maybeLoadScript("vega", "5")
+        .then(() => maybeLoadScript("vega-lite", "5.8.0"))
+        .then(() => maybeLoadScript("vega-embed", "6"))
+        .catch(showError)
+        .then(() => displayChart(vegaEmbed));
+    }
+  })({"config": {"view": {"continuousWidth": 300, "continuousHeight": 300}}, "hconcat": [{"layer": [{"mark": {"type": "geoshape", "stroke": "black"}, "encoding": {"color": {"field": "GPA", "scale": {"range": ["#00072D", "#0A2472", "#0E6BA8", "#A6E1FA", "#99ABC5", "#8B748F", "#6F0624"]}, "type": "quantitative"}, "opacity": {"condition": {"test": "isValid(datum.GPA)", "value": 1}, "value": 0.2}, "tooltip": [{"field": "State", "type": "nominal"}, {"field": "GPA", "type": "quantitative"}]}, "name": "view_19", "projection": {"type": "albersUsa"}, "title": "Average Admitted GPA by State", "transform": [{"lookup": "id", "from": {"data": {"name": "data-d3d0ed36e8c2fb29c3c0f0fd583e90d7"}, "key": "StateID", "fields": ["State", "GPA", "WorkExp", "TestScore", "WritingScore", "VolunteerLevel", "State_Abbr", "StateID"]}}]}, {"mark": {"type": "geoshape", "fill": "grey", "stroke": "white"}, "encoding": {"opacity": {"condition": {"test": "isValid(datum.GPA)", "value": 0}, "value": 0.2}}, "projection": {"type": "albersUsa"}}], "encoding": {"tooltip": [{"field": "State", "type": "nominal"}, {"field": "GPA", "type": "quantitative"}]}, "height": 200, "transform": [{"lookup": "id", "from": {"data": {"name": "data-d3d0ed36e8c2fb29c3c0f0fd583e90d7"}, "key": "StateID", "fields": ["State", "GPA", "WorkExp", "TestScore", "WritingScore", "VolunteerLevel", "State_Abbr", "StateID"]}}], "width": 333}, {"layer": [{"mark": {"type": "geoshape", "stroke": "black"}, "encoding": {"color": {"field": "GPA", "scale": {"range": ["#00072D", "#0A2472", "#0E6BA8", "#A6E1FA", "#99ABC5", "#8B748F", "#6F0624"]}, "type": "quantitative"}, "opacity": {"condition": {"test": "isValid(datum.GPA)", "value": 1}, "value": 0.2}, "tooltip": [{"field": "State", "type": "nominal"}, {"field": "GPA", "type": "quantitative"}]}, "name": "view_20", "projection": {"type": "albersUsa"}, "title": "Average Declined GPA by State", "transform": [{"lookup": "id", "from": {"data": {"name": "data-43214490c46030f59366cc15e9329957"}, "key": "StateID", "fields": ["State", "GPA", "WorkExp", "TestScore", "WritingScore", "VolunteerLevel", "State_Abbr", "StateID"]}}]}, {"mark": {"type": "geoshape", "fill": "grey", "stroke": "white"}, "encoding": {"opacity": {"condition": {"test": "isValid(datum.GPA)", "value": 0}, "value": 0.2}}, "projection": {"type": "albersUsa"}}], "encoding": {"tooltip": [{"field": "State", "type": "nominal"}, {"field": "GPA", "type": "quantitative"}]}, "height": 200, "transform": [{"lookup": "id", "from": {"data": {"name": "data-43214490c46030f59366cc15e9329957"}, "key": "StateID", "fields": ["State", "GPA", "WorkExp", "TestScore", "WritingScore", "VolunteerLevel", "State_Abbr", "StateID"]}}], "width": 333}], "data": {"url": "https://raw.githubusercontent.com/vega/vega-datasets/master/data/us-10m.json", "format": {"feature": "states", "type": "topojson"}}, "params": [{"name": "param_12", "select": {"type": "point", "fields": ["State"]}, "views": ["view_19", "view_20"]}, {"name": "param_13", "select": {"type": "interval", "encodings": ["x", "y"]}, "bind": "scales", "views": ["view_19"]}, {"name": "param_14", "select": {"type": "interval", "encodings": ["x", "y"]}, "bind": "scales", "views": ["view_19"]}, {"name": "param_15", "select": {"type": "interval", "encodings": ["x", "y"]}, "bind": "scales", "views": ["view_20"]}, {"name": "param_16", "select": {"type": "interval", "encodings": ["x", "y"]}, "bind": "scales", "views": ["view_20"]}], "$schema": "https://vega.github.io/schema/vega-lite/v5.8.0.json", "datasets": {"data-d3d0ed36e8c2fb29c3c0f0fd583e90d7": [{"State": "California", "GPA": 3.764444444444445, "WorkExp": 3.111111111111111, "TestScore": 946.4444444444445, "WritingScore": 94.44444444444444, "VolunteerLevel": 2.5555555555555554, "State_Abbr": "CA", "StateID": 6}, {"State": "Colorado", "GPA": 3.71875, "WorkExp": 1.575, "TestScore": 967.375, "WritingScore": 82.375, "VolunteerLevel": 2.0, "State_Abbr": "CO", "StateID": 8}, {"State": "Florida", "GPA": 3.7318181818181815, "WorkExp": 1.5909090909090908, "TestScore": 966.1818181818181, "WritingScore": 87.18181818181819, "VolunteerLevel": 2.1818181818181817, "State_Abbr": "FL", "StateID": 12}, {"State": "Utah", "GPA": 3.78, "WorkExp": 1.2, "TestScore": 968.0, "WritingScore": 87.0, "VolunteerLevel": 2.0, "State_Abbr": "UT", "StateID": 49}], "data-43214490c46030f59366cc15e9329957": [{"State": "California", "GPA": 2.34, "WorkExp": 0.8, "TestScore": 754.0, "WritingScore": 76.0, "VolunteerLevel": 1.0, "State_Abbr": "CA", "StateID": 6}, {"State": "Colorado", "GPA": 3.1166666666666667, "WorkExp": 2.183333333333333, "TestScore": 762.6666666666666, "WritingScore": 74.0, "VolunteerLevel": 2.6666666666666665, "State_Abbr": "CO", "StateID": 8}, {"State": "Florida", "GPA": 3.4853846153846155, "WorkExp": 2.223076923076923, "TestScore": 799.2307692307693, "WritingScore": 72.84615384615384, "VolunteerLevel": 2.6153846153846154, "State_Abbr": "FL", "StateID": 12}, {"State": "Mississippi", "GPA": 2.91, "WorkExp": 6.2, "TestScore": 753.0, "WritingScore": 77.0, "VolunteerLevel": 1.0, "State_Abbr": "MS", "StateID": 28}, {"State": "Oregon", "GPA": 2.9, "WorkExp": 0.9, "TestScore": 769.0, "WritingScore": 87.0, "VolunteerLevel": 4.0, "State_Abbr": "OR", "StateID": 41}, {"State": "Utah", "GPA": 3.17, "WorkExp": 1.1, "TestScore": 768.5, "WritingScore": 69.5, "VolunteerLevel": 1.5, "State_Abbr": "UT", "StateID": 49}, {"State": "Virginia", "GPA": 3.1425, "WorkExp": 2.375, "TestScore": 766.0, "WritingScore": 76.5, "VolunteerLevel": 3.25, "State_Abbr": "VA", "StateID": 51}]}}, {"mode": "vega-lite"});
+</script>
+</div>
+</div>
+<div class="cell" data-execution_count="70">
+<div class="sourceCode cell-code" id="cb38"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> altair <span class="im">as</span> alt</span>
+<span id="cb38-2"><a href="#cb38-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> vega_datasets <span class="im">import</span> data</span>
+<span id="cb38-3"><a href="#cb38-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-4"><a href="#cb38-4" aria-hidden="true" tabindex="-1"></a>states <span class="op">=</span> alt.topo_feature(<span class="st">'https://raw.githubusercontent.com/vega/vega-datasets/master/data/us-10m.json'</span>, <span class="st">'states'</span>)</span>
+<span id="cb38-5"><a href="#cb38-5" aria-hidden="true" tabindex="-1"></a>click <span class="op">=</span> alt.selection_multi(fields <span class="op">=</span> [<span class="st">"State"</span>])</span>
+<span id="cb38-6"><a href="#cb38-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-7"><a href="#cb38-7" aria-hidden="true" tabindex="-1"></a>state_id_dict <span class="op">=</span> <span class="bu">dict</span>(<span class="bu">zip</span>(data.population_engineers_hurricanes()[<span class="st">"state"</span>], data.population_engineers_hurricanes()[<span class="st">"id"</span>]))</span>
+<span id="cb38-8"><a href="#cb38-8" aria-hidden="true" tabindex="-1"></a>avg_admit[<span class="st">"StateID"</span>] <span class="op">=</span> avg_admit[<span class="st">"State"</span>].<span class="bu">map</span>(state_id_dict)</span>
+<span id="cb38-9"><a href="#cb38-9" aria-hidden="true" tabindex="-1"></a>avg_decline[<span class="st">"StateID"</span>] <span class="op">=</span> avg_decline[<span class="st">"State"</span>].<span class="bu">map</span>(state_id_dict)</span>
+<span id="cb38-10"><a href="#cb38-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-11"><a href="#cb38-11" aria-hidden="true" tabindex="-1"></a>existing_states <span class="op">=</span> alt.Chart(states).mark_geoshape(stroke<span class="op">=</span><span class="st">'black'</span>).encode(</span>
+<span id="cb38-12"><a href="#cb38-12" aria-hidden="true" tabindex="-1"></a>    color <span class="op">=</span> alt.Color(<span class="st">"TestScore:Q"</span>, scale<span class="op">=</span>alt.Scale(<span class="bu">range</span><span class="op">=</span>custom_palette)),</span>
+<span id="cb38-13"><a href="#cb38-13" aria-hidden="true" tabindex="-1"></a>    tooltip <span class="op">=</span> [<span class="st">"State:N"</span>, <span class="st">"TestScore:Q"</span>],</span>
+<span id="cb38-14"><a href="#cb38-14" aria-hidden="true" tabindex="-1"></a>    opacity <span class="op">=</span> alt.condition(<span class="st">'isValid(datum.TestScore)'</span>, alt.value(<span class="dv">1</span>), alt.value(<span class="fl">0.2</span>)),</span>
+<span id="cb38-15"><a href="#cb38-15" aria-hidden="true" tabindex="-1"></a>).transform_lookup(</span>
+<span id="cb38-16"><a href="#cb38-16" aria-hidden="true" tabindex="-1"></a>    lookup <span class="op">=</span> <span class="st">"id"</span>,</span>
+<span id="cb38-17"><a href="#cb38-17" aria-hidden="true" tabindex="-1"></a>    from_ <span class="op">=</span> alt.LookupData(avg_admit, <span class="st">"StateID"</span>, <span class="bu">list</span>(avg_admit.columns))</span>
+<span id="cb38-18"><a href="#cb38-18" aria-hidden="true" tabindex="-1"></a>).properties(width <span class="op">=</span> <span class="dv">333</span>, height <span class="op">=</span> <span class="dv">200</span>, title<span class="op">=</span><span class="st">"Average Admitted Test Score by State"</span>).add_selection(click).project(<span class="bu">type</span> <span class="op">=</span> <span class="st">"albersUsa"</span>).interactive()</span>
+<span id="cb38-19"><a href="#cb38-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-20"><a href="#cb38-20" aria-hidden="true" tabindex="-1"></a>missing_states <span class="op">=</span> (</span>
+<span id="cb38-21"><a href="#cb38-21" aria-hidden="true" tabindex="-1"></a>    alt.Chart(states)</span>
+<span id="cb38-22"><a href="#cb38-22" aria-hidden="true" tabindex="-1"></a>    .mark_geoshape(fill <span class="op">=</span> <span class="st">"grey"</span>, stroke <span class="op">=</span> <span class="st">"white"</span>)</span>
+<span id="cb38-23"><a href="#cb38-23" aria-hidden="true" tabindex="-1"></a>    .encode(opacity<span class="op">=</span>alt.condition(<span class="st">"isValid(datum.TestScore)"</span>, alt.value(<span class="dv">0</span>), alt.value(<span class="fl">0.2</span>))).add_selection(click).project(<span class="bu">type</span> <span class="op">=</span> <span class="st">"albersUsa"</span>)</span>
+<span id="cb38-24"><a href="#cb38-24" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb38-25"><a href="#cb38-25" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-26"><a href="#cb38-26" aria-hidden="true" tabindex="-1"></a>admit_map <span class="op">=</span> existing_states <span class="op">+</span> missing_states</span>
+<span id="cb38-27"><a href="#cb38-27" aria-hidden="true" tabindex="-1"></a>admit_map <span class="op">=</span> admit_map.encode(</span>
+<span id="cb38-28"><a href="#cb38-28" aria-hidden="true" tabindex="-1"></a>    tooltip<span class="op">=</span> [<span class="st">"State:N"</span>, <span class="st">"TestScore:Q"</span>]</span>
+<span id="cb38-29"><a href="#cb38-29" aria-hidden="true" tabindex="-1"></a>    ).transform_lookup(</span>
+<span id="cb38-30"><a href="#cb38-30" aria-hidden="true" tabindex="-1"></a>        lookup<span class="op">=</span><span class="st">"id"</span>,</span>
+<span id="cb38-31"><a href="#cb38-31" aria-hidden="true" tabindex="-1"></a>        from_<span class="op">=</span>alt.LookupData(avg_admit, <span class="st">"StateID"</span>, <span class="bu">list</span>(avg_admit.columns))</span>
+<span id="cb38-32"><a href="#cb38-32" aria-hidden="true" tabindex="-1"></a>    ).interactive()</span>
+<span id="cb38-33"><a href="#cb38-33" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-34"><a href="#cb38-34" aria-hidden="true" tabindex="-1"></a>existing_states <span class="op">=</span> alt.Chart(states).mark_geoshape(stroke<span class="op">=</span><span class="st">'black'</span>).encode(</span>
+<span id="cb38-35"><a href="#cb38-35" aria-hidden="true" tabindex="-1"></a>    color <span class="op">=</span> alt.Color(<span class="st">"TestScore:Q"</span>, scale<span class="op">=</span>alt.Scale(<span class="bu">range</span><span class="op">=</span>custom_palette)),</span>
+<span id="cb38-36"><a href="#cb38-36" aria-hidden="true" tabindex="-1"></a>    tooltip <span class="op">=</span> [<span class="st">"State:N"</span>, <span class="st">"TestScore:Q"</span>],</span>
+<span id="cb38-37"><a href="#cb38-37" aria-hidden="true" tabindex="-1"></a>    opacity <span class="op">=</span> alt.condition(<span class="st">'isValid(datum.TestScore)'</span>, alt.value(<span class="dv">1</span>), alt.value(<span class="fl">0.2</span>)),</span>
+<span id="cb38-38"><a href="#cb38-38" aria-hidden="true" tabindex="-1"></a>).transform_lookup(</span>
+<span id="cb38-39"><a href="#cb38-39" aria-hidden="true" tabindex="-1"></a>    lookup <span class="op">=</span> <span class="st">"id"</span>,</span>
+<span id="cb38-40"><a href="#cb38-40" aria-hidden="true" tabindex="-1"></a>    from_ <span class="op">=</span> alt.LookupData(avg_decline, <span class="st">"StateID"</span>, <span class="bu">list</span>(avg_decline.columns))</span>
+<span id="cb38-41"><a href="#cb38-41" aria-hidden="true" tabindex="-1"></a>).properties(width <span class="op">=</span> <span class="dv">333</span>, height <span class="op">=</span> <span class="dv">200</span>, title<span class="op">=</span><span class="st">"Average Declined Test Score by State"</span>).add_selection(click).project(<span class="bu">type</span> <span class="op">=</span> <span class="st">"albersUsa"</span>).interactive()</span>
+<span id="cb38-42"><a href="#cb38-42" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-43"><a href="#cb38-43" aria-hidden="true" tabindex="-1"></a>missing_states <span class="op">=</span> (</span>
+<span id="cb38-44"><a href="#cb38-44" aria-hidden="true" tabindex="-1"></a>    alt.Chart(states)</span>
+<span id="cb38-45"><a href="#cb38-45" aria-hidden="true" tabindex="-1"></a>    .mark_geoshape(fill <span class="op">=</span> <span class="st">"grey"</span>, stroke <span class="op">=</span> <span class="st">"white"</span>)</span>
+<span id="cb38-46"><a href="#cb38-46" aria-hidden="true" tabindex="-1"></a>    .encode(opacity<span class="op">=</span>alt.condition(<span class="st">"isValid(datum.TestScore)"</span>, alt.value(<span class="dv">0</span>), alt.value(<span class="fl">0.2</span>))).add_selection(click).project(<span class="bu">type</span> <span class="op">=</span> <span class="st">"albersUsa"</span>)</span>
+<span id="cb38-47"><a href="#cb38-47" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb38-48"><a href="#cb38-48" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-49"><a href="#cb38-49" aria-hidden="true" tabindex="-1"></a>decline_map <span class="op">=</span> existing_states <span class="op">+</span> missing_states</span>
+<span id="cb38-50"><a href="#cb38-50" aria-hidden="true" tabindex="-1"></a>decline_map <span class="op">=</span> decline_map.encode(</span>
+<span id="cb38-51"><a href="#cb38-51" aria-hidden="true" tabindex="-1"></a>    tooltip<span class="op">=</span> [<span class="st">"State:N"</span>, <span class="st">"TestScore:Q"</span>]</span>
+<span id="cb38-52"><a href="#cb38-52" aria-hidden="true" tabindex="-1"></a>    ).transform_lookup(</span>
+<span id="cb38-53"><a href="#cb38-53" aria-hidden="true" tabindex="-1"></a>        lookup<span class="op">=</span><span class="st">"id"</span>,</span>
+<span id="cb38-54"><a href="#cb38-54" aria-hidden="true" tabindex="-1"></a>        from_<span class="op">=</span>alt.LookupData(avg_decline, <span class="st">"StateID"</span>, <span class="bu">list</span>(avg_decline.columns))</span>
+<span id="cb38-55"><a href="#cb38-55" aria-hidden="true" tabindex="-1"></a>    ).interactive()</span>
+<span id="cb38-56"><a href="#cb38-56" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-57"><a href="#cb38-57" aria-hidden="true" tabindex="-1"></a>admit_map <span class="op">|</span> decline_map</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>c:\Users\theda\anaconda3\Lib\site-packages\altair\utils\deprecation.py:65: AltairDeprecationWarning:
+
+'selection_multi' is deprecated.  Use 'selection_point'
+
+c:\Users\theda\anaconda3\Lib\site-packages\altair\utils\deprecation.py:65: AltairDeprecationWarning:
+
+'add_selection' is deprecated. Use 'add_params' instead.
+</code></pre>
+</div>
+<div class="cell-output cell-output-display" data-execution_count="70">
+
+<style>
+  #altair-viz-c26c32c5c72d45279d5212f434a64c13.vega-embed {
+    width: 100%;
+    display: flex;
+  }
+
+  #altair-viz-c26c32c5c72d45279d5212f434a64c13.vega-embed details,
+  #altair-viz-c26c32c5c72d45279d5212f434a64c13.vega-embed details summary {
+    position: relative;
+  }
+</style>
+<div id="altair-viz-c26c32c5c72d45279d5212f434a64c13"></div>
+<script type="text/javascript">
+  var VEGA_DEBUG = (typeof VEGA_DEBUG == "undefined") ? {} : VEGA_DEBUG;
+  (function(spec, embedOpt){
+    let outputDiv = document.currentScript.previousElementSibling;
+    if (outputDiv.id !== "altair-viz-c26c32c5c72d45279d5212f434a64c13") {
+      outputDiv = document.getElementById("altair-viz-c26c32c5c72d45279d5212f434a64c13");
+    }
+    const paths = {
+      "vega": "https://cdn.jsdelivr.net/npm/vega@5?noext",
+      "vega-lib": "https://cdn.jsdelivr.net/npm/vega-lib?noext",
+      "vega-lite": "https://cdn.jsdelivr.net/npm/vega-lite@5.8.0?noext",
+      "vega-embed": "https://cdn.jsdelivr.net/npm/vega-embed@6?noext",
+    };
+
+    function maybeLoadScript(lib, version) {
+      var key = `${lib.replace("-", "")}_version`;
+      return (VEGA_DEBUG[key] == version) ?
+        Promise.resolve(paths[lib]) :
+        new Promise(function(resolve, reject) {
+          var s = document.createElement('script');
+          document.getElementsByTagName("head")[0].appendChild(s);
+          s.async = true;
+          s.onload = () => {
+            VEGA_DEBUG[key] = version;
+            return resolve(paths[lib]);
+          };
+          s.onerror = () => reject(`Error loading script: ${paths[lib]}`);
+          s.src = paths[lib];
+        });
+    }
+
+    function showError(err) {
+      outputDiv.innerHTML = `<div class="error" style="color:red;">${err}</div>`;
+      throw err;
+    }
+
+    function displayChart(vegaEmbed) {
+      vegaEmbed(outputDiv, spec, embedOpt)
+        .catch(err => showError(`Javascript Error: ${err.message}<br>This usually means there's a typo in your chart specification. See the javascript console for the full traceback.`));
+    }
+
+    if(typeof define === "function" && define.amd) {
+      requirejs.config({paths});
+      require(["vega-embed"], displayChart, err => showError(`Error loading script: ${err.message}`));
+    } else {
+      maybeLoadScript("vega", "5")
+        .then(() => maybeLoadScript("vega-lite", "5.8.0"))
+        .then(() => maybeLoadScript("vega-embed", "6"))
+        .catch(showError)
+        .then(() => displayChart(vegaEmbed));
+    }
+  })({"config": {"view": {"continuousWidth": 300, "continuousHeight": 300}}, "hconcat": [{"layer": [{"mark": {"type": "geoshape", "stroke": "black"}, "encoding": {"color": {"field": "TestScore", "scale": {"range": ["#00072D", "#0A2472", "#0E6BA8", "#A6E1FA", "#99ABC5", "#8B748F", "#6F0624"]}, "type": "quantitative"}, "opacity": {"condition": {"test": "isValid(datum.TestScore)", "value": 1}, "value": 0.2}, "tooltip": [{"field": "State", "type": "nominal"}, {"field": "TestScore", "type": "quantitative"}]}, "name": "view_21", "projection": {"type": "albersUsa"}, "title": "Average Admitted Test Score by State", "transform": [{"lookup": "id", "from": {"data": {"name": "data-d3d0ed36e8c2fb29c3c0f0fd583e90d7"}, "key": "StateID", "fields": ["State", "GPA", "WorkExp", "TestScore", "WritingScore", "VolunteerLevel", "State_Abbr", "StateID"]}}]}, {"mark": {"type": "geoshape", "fill": "grey", "stroke": "white"}, "encoding": {"opacity": {"condition": {"test": "isValid(datum.TestScore)", "value": 0}, "value": 0.2}}, "projection": {"type": "albersUsa"}}], "encoding": {"tooltip": [{"field": "State", "type": "nominal"}, {"field": "TestScore", "type": "quantitative"}]}, "height": 200, "transform": [{"lookup": "id", "from": {"data": {"name": "data-d3d0ed36e8c2fb29c3c0f0fd583e90d7"}, "key": "StateID", "fields": ["State", "GPA", "WorkExp", "TestScore", "WritingScore", "VolunteerLevel", "State_Abbr", "StateID"]}}], "width": 333}, {"layer": [{"mark": {"type": "geoshape", "stroke": "black"}, "encoding": {"color": {"field": "TestScore", "scale": {"range": ["#00072D", "#0A2472", "#0E6BA8", "#A6E1FA", "#99ABC5", "#8B748F", "#6F0624"]}, "type": "quantitative"}, "opacity": {"condition": {"test": "isValid(datum.TestScore)", "value": 1}, "value": 0.2}, "tooltip": [{"field": "State", "type": "nominal"}, {"field": "TestScore", "type": "quantitative"}]}, "name": "view_22", "projection": {"type": "albersUsa"}, "title": "Average Declined Test Score by State", "transform": [{"lookup": "id", "from": {"data": {"name": "data-43214490c46030f59366cc15e9329957"}, "key": "StateID", "fields": ["State", "GPA", "WorkExp", "TestScore", "WritingScore", "VolunteerLevel", "State_Abbr", "StateID"]}}]}, {"mark": {"type": "geoshape", "fill": "grey", "stroke": "white"}, "encoding": {"opacity": {"condition": {"test": "isValid(datum.TestScore)", "value": 0}, "value": 0.2}}, "projection": {"type": "albersUsa"}}], "encoding": {"tooltip": [{"field": "State", "type": "nominal"}, {"field": "TestScore", "type": "quantitative"}]}, "height": 200, "transform": [{"lookup": "id", "from": {"data": {"name": "data-43214490c46030f59366cc15e9329957"}, "key": "StateID", "fields": ["State", "GPA", "WorkExp", "TestScore", "WritingScore", "VolunteerLevel", "State_Abbr", "StateID"]}}], "width": 333}], "data": {"url": "https://raw.githubusercontent.com/vega/vega-datasets/master/data/us-10m.json", "format": {"feature": "states", "type": "topojson"}}, "params": [{"name": "param_17", "select": {"type": "point", "fields": ["State"]}, "views": ["view_21", "view_22"]}, {"name": "param_18", "select": {"type": "interval", "encodings": ["x", "y"]}, "bind": "scales", "views": ["view_21"]}, {"name": "param_19", "select": {"type": "interval", "encodings": ["x", "y"]}, "bind": "scales", "views": ["view_21"]}, {"name": "param_20", "select": {"type": "interval", "encodings": ["x", "y"]}, "bind": "scales", "views": ["view_22"]}, {"name": "param_21", "select": {"type": "interval", "encodings": ["x", "y"]}, "bind": "scales", "views": ["view_22"]}], "$schema": "https://vega.github.io/schema/vega-lite/v5.8.0.json", "datasets": {"data-d3d0ed36e8c2fb29c3c0f0fd583e90d7": [{"State": "California", "GPA": 3.764444444444445, "WorkExp": 3.111111111111111, "TestScore": 946.4444444444445, "WritingScore": 94.44444444444444, "VolunteerLevel": 2.5555555555555554, "State_Abbr": "CA", "StateID": 6}, {"State": "Colorado", "GPA": 3.71875, "WorkExp": 1.575, "TestScore": 967.375, "WritingScore": 82.375, "VolunteerLevel": 2.0, "State_Abbr": "CO", "StateID": 8}, {"State": "Florida", "GPA": 3.7318181818181815, "WorkExp": 1.5909090909090908, "TestScore": 966.1818181818181, "WritingScore": 87.18181818181819, "VolunteerLevel": 2.1818181818181817, "State_Abbr": "FL", "StateID": 12}, {"State": "Utah", "GPA": 3.78, "WorkExp": 1.2, "TestScore": 968.0, "WritingScore": 87.0, "VolunteerLevel": 2.0, "State_Abbr": "UT", "StateID": 49}], "data-43214490c46030f59366cc15e9329957": [{"State": "California", "GPA": 2.34, "WorkExp": 0.8, "TestScore": 754.0, "WritingScore": 76.0, "VolunteerLevel": 1.0, "State_Abbr": "CA", "StateID": 6}, {"State": "Colorado", "GPA": 3.1166666666666667, "WorkExp": 2.183333333333333, "TestScore": 762.6666666666666, "WritingScore": 74.0, "VolunteerLevel": 2.6666666666666665, "State_Abbr": "CO", "StateID": 8}, {"State": "Florida", "GPA": 3.4853846153846155, "WorkExp": 2.223076923076923, "TestScore": 799.2307692307693, "WritingScore": 72.84615384615384, "VolunteerLevel": 2.6153846153846154, "State_Abbr": "FL", "StateID": 12}, {"State": "Mississippi", "GPA": 2.91, "WorkExp": 6.2, "TestScore": 753.0, "WritingScore": 77.0, "VolunteerLevel": 1.0, "State_Abbr": "MS", "StateID": 28}, {"State": "Oregon", "GPA": 2.9, "WorkExp": 0.9, "TestScore": 769.0, "WritingScore": 87.0, "VolunteerLevel": 4.0, "State_Abbr": "OR", "StateID": 41}, {"State": "Utah", "GPA": 3.17, "WorkExp": 1.1, "TestScore": 768.5, "WritingScore": 69.5, "VolunteerLevel": 1.5, "State_Abbr": "UT", "StateID": 49}, {"State": "Virginia", "GPA": 3.1425, "WorkExp": 2.375, "TestScore": 766.0, "WritingScore": 76.5, "VolunteerLevel": 3.25, "State_Abbr": "VA", "StateID": 51}]}}, {"mode": "vega-lite"});
+</script>
+</div>
+</div>
+<div class="cell" data-execution_count="61">
+<div class="sourceCode cell-code" id="cb40"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb40-1"><a href="#cb40-1" aria-hidden="true" tabindex="-1"></a>melted_admit <span class="op">=</span> pd.melt(avg_admit, id_vars<span class="op">=</span>[<span class="st">'StateID'</span>], var_name<span class="op">=</span><span class="st">'variable'</span>, value_name<span class="op">=</span><span class="st">'value'</span>)</span>
+<span id="cb40-2"><a href="#cb40-2" aria-hidden="true" tabindex="-1"></a>melted_decline <span class="op">=</span> pd.melt(avg_decline, id_vars<span class="op">=</span>[<span class="st">'StateID'</span>], var_name<span class="op">=</span><span class="st">'variable'</span>, value_name<span class="op">=</span><span class="st">'value'</span>)</span>
+<span id="cb40-3"><a href="#cb40-3" aria-hidden="true" tabindex="-1"></a>remove <span class="op">=</span> [<span class="st">'State_Abbr'</span>, <span class="st">'State'</span>]</span>
+<span id="cb40-4"><a href="#cb40-4" aria-hidden="true" tabindex="-1"></a>melted_admit <span class="op">=</span> melted_admit[<span class="op">~</span>melted_admit[<span class="st">'variable'</span>].isin(remove)]</span>
+<span id="cb40-5"><a href="#cb40-5" aria-hidden="true" tabindex="-1"></a>melted_admit</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="61">
+<div>
+
+
+<table class="dataframe table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">StateID</th>
+<th data-quarto-table-cell-role="th">variable</th>
+<th data-quarto-table-cell-role="th">value</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">4</td>
+<td>6</td>
+<td>GPA</td>
+<td>3.764444</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">5</td>
+<td>8</td>
+<td>GPA</td>
+<td>3.71875</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">6</td>
+<td>12</td>
+<td>GPA</td>
+<td>3.731818</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">7</td>
+<td>49</td>
+<td>GPA</td>
+<td>3.78</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">8</td>
+<td>6</td>
+<td>WorkExp</td>
+<td>3.111111</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">9</td>
+<td>8</td>
+<td>WorkExp</td>
+<td>1.575</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">10</td>
+<td>12</td>
+<td>WorkExp</td>
+<td>1.590909</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">11</td>
+<td>49</td>
+<td>WorkExp</td>
+<td>1.2</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">12</td>
+<td>6</td>
+<td>TestScore</td>
+<td>946.444444</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">13</td>
+<td>8</td>
+<td>TestScore</td>
+<td>967.375</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">14</td>
+<td>12</td>
+<td>TestScore</td>
+<td>966.181818</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">15</td>
+<td>49</td>
+<td>TestScore</td>
+<td>968.0</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">16</td>
+<td>6</td>
+<td>WritingScore</td>
+<td>94.444444</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">17</td>
+<td>8</td>
+<td>WritingScore</td>
+<td>82.375</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">18</td>
+<td>12</td>
+<td>WritingScore</td>
+<td>87.181818</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">19</td>
+<td>49</td>
+<td>WritingScore</td>
+<td>87.0</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">20</td>
+<td>6</td>
+<td>VolunteerLevel</td>
+<td>2.555556</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">21</td>
+<td>8</td>
+<td>VolunteerLevel</td>
+<td>2.0</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">22</td>
+<td>12</td>
+<td>VolunteerLevel</td>
+<td>2.181818</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">23</td>
+<td>49</td>
+<td>VolunteerLevel</td>
+<td>2.0</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+<div class="cell" data-execution_count="68">
+<div class="sourceCode cell-code" id="cb41"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb41-1"><a href="#cb41-1" aria-hidden="true" tabindex="-1"></a>existing_states <span class="op">=</span> alt.Chart(states).mark_geoshape(stroke<span class="op">=</span><span class="st">'black'</span>).encode(</span>
+<span id="cb41-2"><a href="#cb41-2" aria-hidden="true" tabindex="-1"></a>    color<span class="op">=</span>alt.Color(<span class="st">"value:Q"</span>, scale<span class="op">=</span>alt.Scale(<span class="bu">range</span><span class="op">=</span>custom_palette)),</span>
+<span id="cb41-3"><a href="#cb41-3" aria-hidden="true" tabindex="-1"></a>    tooltip<span class="op">=</span>[<span class="st">"State:N"</span>, <span class="st">"value:Q"</span>],</span>
+<span id="cb41-4"><a href="#cb41-4" aria-hidden="true" tabindex="-1"></a>    opacity<span class="op">=</span>alt.condition(<span class="st">'isValid(datum.value)'</span>, alt.value(<span class="dv">1</span>), alt.value(<span class="fl">0.2</span>)),</span>
+<span id="cb41-5"><a href="#cb41-5" aria-hidden="true" tabindex="-1"></a>).transform_lookup(</span>
+<span id="cb41-6"><a href="#cb41-6" aria-hidden="true" tabindex="-1"></a>    lookup<span class="op">=</span><span class="st">"id"</span>,</span>
+<span id="cb41-7"><a href="#cb41-7" aria-hidden="true" tabindex="-1"></a>    from_<span class="op">=</span>alt.LookupData(melted_admit, <span class="st">"StateID"</span>, <span class="bu">list</span>(melted_admit.columns))</span>
+<span id="cb41-8"><a href="#cb41-8" aria-hidden="true" tabindex="-1"></a>).properties(width<span class="op">=</span><span class="dv">333</span>, height<span class="op">=</span><span class="dv">200</span>, title<span class="op">=</span><span class="st">"blah"</span>)</span>
+<span id="cb41-9"><a href="#cb41-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb41-10"><a href="#cb41-10" aria-hidden="true" tabindex="-1"></a>missing_states <span class="op">=</span> (</span>
+<span id="cb41-11"><a href="#cb41-11" aria-hidden="true" tabindex="-1"></a>    alt.Chart(states)</span>
+<span id="cb41-12"><a href="#cb41-12" aria-hidden="true" tabindex="-1"></a>    .mark_geoshape(fill <span class="op">=</span> <span class="st">"grey"</span>, stroke <span class="op">=</span> <span class="st">"white"</span>)</span>
+<span id="cb41-13"><a href="#cb41-13" aria-hidden="true" tabindex="-1"></a>    .encode(opacity<span class="op">=</span>alt.condition(<span class="st">"isValid(datum.Rate)"</span>, alt.value(<span class="dv">0</span>), alt.value(<span class="fl">0.2</span>))).add_selection(click).project(<span class="bu">type</span> <span class="op">=</span> <span class="st">"albersUsa"</span>)</span>
+<span id="cb41-14"><a href="#cb41-14" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb41-15"><a href="#cb41-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb41-16"><a href="#cb41-16" aria-hidden="true" tabindex="-1"></a>admit_map <span class="op">=</span> existing_states <span class="op">+</span> missing_states</span>
+<span id="cb41-17"><a href="#cb41-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb41-18"><a href="#cb41-18" aria-hidden="true" tabindex="-1"></a>selector <span class="op">=</span> alt.selection_single(</span>
+<span id="cb41-19"><a href="#cb41-19" aria-hidden="true" tabindex="-1"></a>    fields<span class="op">=</span>[<span class="st">'variable'</span>],</span>
+<span id="cb41-20"><a href="#cb41-20" aria-hidden="true" tabindex="-1"></a>    bind<span class="op">=</span>alt.binding_select(options<span class="op">=</span><span class="bu">list</span>(melted_admit[<span class="st">'variable'</span>].unique())),</span>
+<span id="cb41-21"><a href="#cb41-21" aria-hidden="true" tabindex="-1"></a>    name<span class="op">=</span><span class="st">'Select Variable'</span></span>
+<span id="cb41-22"><a href="#cb41-22" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb41-23"><a href="#cb41-23" aria-hidden="true" tabindex="-1"></a>admit_map <span class="op">=</span> admit_map.add_selection(selector).transform_filter(selector)</span>
+<span id="cb41-24"><a href="#cb41-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb41-25"><a href="#cb41-25" aria-hidden="true" tabindex="-1"></a>admit_map <span class="op">=</span> admit_map.add_selection(selector).transform_filter(</span>
+<span id="cb41-26"><a href="#cb41-26" aria-hidden="true" tabindex="-1"></a>    selector</span>
+<span id="cb41-27"><a href="#cb41-27" aria-hidden="true" tabindex="-1"></a>).transform_lookup(</span>
+<span id="cb41-28"><a href="#cb41-28" aria-hidden="true" tabindex="-1"></a>    lookup<span class="op">=</span><span class="st">'id'</span>,</span>
+<span id="cb41-29"><a href="#cb41-29" aria-hidden="true" tabindex="-1"></a>    from_<span class="op">=</span>alt.LookupData(melted_admit, <span class="st">"StateID"</span>, <span class="bu">list</span>(melted_admit.columns))</span>
+<span id="cb41-30"><a href="#cb41-30" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb41-31"><a href="#cb41-31" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb41-32"><a href="#cb41-32" aria-hidden="true" tabindex="-1"></a>admit_map</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="68">
+
+<style>
+  #altair-viz-84435d7d7d424be0a935c2d69bf74fe1.vega-embed {
+    width: 100%;
+    display: flex;
+  }
+
+  #altair-viz-84435d7d7d424be0a935c2d69bf74fe1.vega-embed details,
+  #altair-viz-84435d7d7d424be0a935c2d69bf74fe1.vega-embed details summary {
+    position: relative;
+  }
+</style>
+<div id="altair-viz-84435d7d7d424be0a935c2d69bf74fe1"></div>
+<script type="text/javascript">
+  var VEGA_DEBUG = (typeof VEGA_DEBUG == "undefined") ? {} : VEGA_DEBUG;
+  (function(spec, embedOpt){
+    let outputDiv = document.currentScript.previousElementSibling;
+    if (outputDiv.id !== "altair-viz-84435d7d7d424be0a935c2d69bf74fe1") {
+      outputDiv = document.getElementById("altair-viz-84435d7d7d424be0a935c2d69bf74fe1");
+    }
+    const paths = {
+      "vega": "https://cdn.jsdelivr.net/npm/vega@5?noext",
+      "vega-lib": "https://cdn.jsdelivr.net/npm/vega-lib?noext",
+      "vega-lite": "https://cdn.jsdelivr.net/npm/vega-lite@5.8.0?noext",
+      "vega-embed": "https://cdn.jsdelivr.net/npm/vega-embed@6?noext",
+    };
+
+    function maybeLoadScript(lib, version) {
+      var key = `${lib.replace("-", "")}_version`;
+      return (VEGA_DEBUG[key] == version) ?
+        Promise.resolve(paths[lib]) :
+        new Promise(function(resolve, reject) {
+          var s = document.createElement('script');
+          document.getElementsByTagName("head")[0].appendChild(s);
+          s.async = true;
+          s.onload = () => {
+            VEGA_DEBUG[key] = version;
+            return resolve(paths[lib]);
+          };
+          s.onerror = () => reject(`Error loading script: ${paths[lib]}`);
+          s.src = paths[lib];
+        });
+    }
+
+    function showError(err) {
+      outputDiv.innerHTML = `<div class="error" style="color:red;">${err}</div>`;
+      throw err;
+    }
+
+    function displayChart(vegaEmbed) {
+      vegaEmbed(outputDiv, spec, embedOpt)
+        .catch(err => showError(`Javascript Error: ${err.message}<br>This usually means there's a typo in your chart specification. See the javascript console for the full traceback.`));
+    }
+
+    if(typeof define === "function" && define.amd) {
+      requirejs.config({paths});
+      require(["vega-embed"], displayChart, err => showError(`Error loading script: ${err.message}`));
+    } else {
+      maybeLoadScript("vega", "5")
+        .then(() => maybeLoadScript("vega-lite", "5.8.0"))
+        .then(() => maybeLoadScript("vega-embed", "6"))
+        .catch(showError)
+        .then(() => displayChart(vegaEmbed));
+    }
+  })({"config": {"view": {"continuousWidth": 300, "continuousHeight": 300}}, "layer": [{"mark": {"type": "geoshape", "stroke": "black"}, "encoding": {"color": {"field": "value", "scale": {"range": ["#00072D", "#0A2472", "#0E6BA8", "#A6E1FA", "#99ABC5", "#8B748F", "#6F0624"]}, "type": "quantitative"}, "opacity": {"condition": {"test": "isValid(datum.value)", "value": 1}, "value": 0.2}, "tooltip": [{"field": "State", "type": "nominal"}, {"field": "value", "type": "quantitative"}]}, "name": "view_18", "title": "blah", "transform": [{"lookup": "id", "from": {"data": {"name": "data-682a06f318efdb847c6c5b3731617a97"}, "key": "StateID", "fields": ["StateID", "variable", "value"]}}]}, {"mark": {"type": "geoshape", "fill": "grey", "stroke": "white"}, "encoding": {"opacity": {"condition": {"test": "isValid(datum.Rate)", "value": 0}, "value": 0.2}}, "name": "view_17", "projection": {"type": "albersUsa"}}], "data": {"url": "https://raw.githubusercontent.com/vega/vega-datasets/master/data/us-10m.json", "format": {"feature": "states", "type": "topojson"}}, "height": 200, "params": [{"name": "param_7", "select": {"type": "point", "fields": ["State"]}, "views": ["view_17"]}, {"name": "Select Variable", "select": {"type": "point", "fields": ["variable"]}, "bind": {"input": "select", "options": ["GPA", "WorkExp", "TestScore", "WritingScore", "VolunteerLevel"]}, "views": ["view_18"]}], "transform": [{"filter": {"param": "Select Variable"}}, {"filter": {"param": "Select Variable"}}, {"lookup": "id", "from": {"data": {"name": "data-682a06f318efdb847c6c5b3731617a97"}, "key": "StateID", "fields": ["StateID", "variable", "value"]}}], "width": 333, "$schema": "https://vega.github.io/schema/vega-lite/v5.8.0.json", "datasets": {"data-682a06f318efdb847c6c5b3731617a97": [{"StateID": 6, "variable": "GPA", "value": 3.764444444444445}, {"StateID": 8, "variable": "GPA", "value": 3.71875}, {"StateID": 12, "variable": "GPA", "value": 3.7318181818181815}, {"StateID": 49, "variable": "GPA", "value": 3.78}, {"StateID": 6, "variable": "WorkExp", "value": 3.111111111111111}, {"StateID": 8, "variable": "WorkExp", "value": 1.575}, {"StateID": 12, "variable": "WorkExp", "value": 1.5909090909090908}, {"StateID": 49, "variable": "WorkExp", "value": 1.2}, {"StateID": 6, "variable": "TestScore", "value": 946.4444444444445}, {"StateID": 8, "variable": "TestScore", "value": 967.375}, {"StateID": 12, "variable": "TestScore", "value": 966.1818181818181}, {"StateID": 49, "variable": "TestScore", "value": 968.0}, {"StateID": 6, "variable": "WritingScore", "value": 94.44444444444444}, {"StateID": 8, "variable": "WritingScore", "value": 82.375}, {"StateID": 12, "variable": "WritingScore", "value": 87.18181818181819}, {"StateID": 49, "variable": "WritingScore", "value": 87.0}, {"StateID": 6, "variable": "VolunteerLevel", "value": 2.5555555555555554}, {"StateID": 8, "variable": "VolunteerLevel", "value": 2.0}, {"StateID": 12, "variable": "VolunteerLevel", "value": 2.1818181818181817}, {"StateID": 49, "variable": "VolunteerLevel", "value": 2.0}]}}, {"mode": "vega-lite"});
+</script>
+</div>
+</div>
+<div class="cell" data-execution_count="53">
+<div class="sourceCode cell-code" id="cb42"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb42-1"><a href="#cb42-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> altair <span class="im">as</span> alt</span>
+<span id="cb42-2"><a href="#cb42-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb42-3"><a href="#cb42-3" aria-hidden="true" tabindex="-1"></a><span class="co"># melted_admit = pd.melt(avg_admit, id_vars=['State'], var_name='variable', value_name='value')</span></span>
+<span id="cb42-4"><a href="#cb42-4" aria-hidden="true" tabindex="-1"></a><span class="co"># melted_decline = pd.melt(avg_decline, id_vars=['StateID'], var_name='variable', value_name='value')</span></span>
+<span id="cb42-5"><a href="#cb42-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb42-6"><a href="#cb42-6" aria-hidden="true" tabindex="-1"></a><span class="co"># print(melted_admit.head())</span></span>
+<span id="cb42-7"><a href="#cb42-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb42-8"><a href="#cb42-8" aria-hidden="true" tabindex="-1"></a><span class="co"># Create the choropleth map for admitted students</span></span>
+<span id="cb42-9"><a href="#cb42-9" aria-hidden="true" tabindex="-1"></a>admit_map <span class="op">=</span> alt.Chart(states).mark_geoshape(stroke<span class="op">=</span><span class="st">'black'</span>).encode(</span>
+<span id="cb42-10"><a href="#cb42-10" aria-hidden="true" tabindex="-1"></a>    color<span class="op">=</span>alt.Color(<span class="st">"GPA:Q"</span>, scale<span class="op">=</span>alt.Scale(<span class="bu">range</span><span class="op">=</span>custom_palette)),</span>
+<span id="cb42-11"><a href="#cb42-11" aria-hidden="true" tabindex="-1"></a>    tooltip<span class="op">=</span>[<span class="st">"State:N"</span>, <span class="st">"GPA:Q"</span>],</span>
+<span id="cb42-12"><a href="#cb42-12" aria-hidden="true" tabindex="-1"></a>    opacity<span class="op">=</span>alt.condition(<span class="st">'isValid(datum.GPA)'</span>, alt.value(<span class="dv">1</span>), alt.value(<span class="fl">0.2</span>)),</span>
+<span id="cb42-13"><a href="#cb42-13" aria-hidden="true" tabindex="-1"></a>).transform_lookup(</span>
+<span id="cb42-14"><a href="#cb42-14" aria-hidden="true" tabindex="-1"></a>    lookup<span class="op">=</span><span class="st">"id"</span>,</span>
+<span id="cb42-15"><a href="#cb42-15" aria-hidden="true" tabindex="-1"></a>    from_<span class="op">=</span>alt.LookupData(avg_admit, <span class="st">"StateID"</span>, <span class="bu">list</span>(avg_admit.columns))</span>
+<span id="cb42-16"><a href="#cb42-16" aria-hidden="true" tabindex="-1"></a>).properties(width<span class="op">=</span><span class="dv">333</span>, height<span class="op">=</span><span class="dv">200</span>, title<span class="op">=</span><span class="st">"Admission Rates by State"</span>)</span>
+<span id="cb42-17"><a href="#cb42-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb42-18"><a href="#cb42-18" aria-hidden="true" tabindex="-1"></a><span class="co"># Create the choropleth map for declined students</span></span>
+<span id="cb42-19"><a href="#cb42-19" aria-hidden="true" tabindex="-1"></a>decline_map <span class="op">=</span> alt.Chart(states).mark_geoshape(stroke<span class="op">=</span><span class="st">'black'</span>).encode(</span>
+<span id="cb42-20"><a href="#cb42-20" aria-hidden="true" tabindex="-1"></a>    color<span class="op">=</span>alt.Color(<span class="st">"GPA:Q"</span>, scale<span class="op">=</span>alt.Scale(<span class="bu">range</span><span class="op">=</span>custom_palette)),</span>
+<span id="cb42-21"><a href="#cb42-21" aria-hidden="true" tabindex="-1"></a>    tooltip<span class="op">=</span>[<span class="st">"State:N"</span>, <span class="st">"GPA:Q"</span>],</span>
+<span id="cb42-22"><a href="#cb42-22" aria-hidden="true" tabindex="-1"></a>    opacity<span class="op">=</span>alt.condition(<span class="st">'isValid(datum.GPA)'</span>, alt.value(<span class="dv">1</span>), alt.value(<span class="fl">0.2</span>)),</span>
+<span id="cb42-23"><a href="#cb42-23" aria-hidden="true" tabindex="-1"></a>).transform_lookup(</span>
+<span id="cb42-24"><a href="#cb42-24" aria-hidden="true" tabindex="-1"></a>    lookup<span class="op">=</span><span class="st">"id"</span>,</span>
+<span id="cb42-25"><a href="#cb42-25" aria-hidden="true" tabindex="-1"></a>    from_<span class="op">=</span>alt.LookupData(avg_decline, <span class="st">"StateID"</span>, <span class="bu">list</span>(avg_decline.columns))</span>
+<span id="cb42-26"><a href="#cb42-26" aria-hidden="true" tabindex="-1"></a>).properties(width<span class="op">=</span><span class="dv">333</span>, height<span class="op">=</span><span class="dv">200</span>, title<span class="op">=</span><span class="st">"Rejection Rates by State"</span>)</span>
+<span id="cb42-27"><a href="#cb42-27" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb42-28"><a href="#cb42-28" aria-hidden="true" tabindex="-1"></a><span class="co"># Create dropdown menu for variable selection</span></span>
+<span id="cb42-29"><a href="#cb42-29" aria-hidden="true" tabindex="-1"></a>dropdown <span class="op">=</span> alt.binding_select(options<span class="op">=</span><span class="bu">list</span>(avg_admit.columns[:<span class="op">-</span><span class="dv">1</span>]))  <span class="co"># Exclude StateID</span></span>
+<span id="cb42-30"><a href="#cb42-30" aria-hidden="true" tabindex="-1"></a>selector <span class="op">=</span> alt.selection_single(fields<span class="op">=</span>[<span class="st">'variable'</span>], bind<span class="op">=</span>dropdown, name<span class="op">=</span><span class="st">'Select Variable'</span>)</span>
+<span id="cb42-31"><a href="#cb42-31" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb42-32"><a href="#cb42-32" aria-hidden="true" tabindex="-1"></a><span class="co"># Apply dropdown selection to both maps</span></span>
+<span id="cb42-33"><a href="#cb42-33" aria-hidden="true" tabindex="-1"></a>admit_map <span class="op">=</span> admit_map.add_selection(selector).transform_calculate(variable<span class="op">=</span><span class="st">'datum.variable || "GPA"'</span>).transform_filter(selector)</span>
+<span id="cb42-34"><a href="#cb42-34" aria-hidden="true" tabindex="-1"></a>decline_map <span class="op">=</span> decline_map.add_selection(selector).transform_calculate(variable<span class="op">=</span><span class="st">'datum.variable || "GPA"'</span>).transform_filter(selector)</span>
+<span id="cb42-35"><a href="#cb42-35" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb42-36"><a href="#cb42-36" aria-hidden="true" tabindex="-1"></a><span class="co"># Combine both maps side by side</span></span>
+<span id="cb42-37"><a href="#cb42-37" aria-hidden="true" tabindex="-1"></a>combined_map <span class="op">=</span> alt.hconcat(admit_map, decline_map)</span>
+<span id="cb42-38"><a href="#cb42-38" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb42-39"><a href="#cb42-39" aria-hidden="true" tabindex="-1"></a>combined_map</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>        State variable     value
+0  California      GPA  3.764444
+1    Colorado      GPA   3.71875
+2     Florida      GPA  3.731818
+3        Utah      GPA      3.78
+4  California  WorkExp  3.111111</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>c:\Users\theda\anaconda3\Lib\site-packages\altair\utils\deprecation.py:65: AltairDeprecationWarning:
+
+'selection_single' is deprecated.  Use 'selection_point'
+
+c:\Users\theda\anaconda3\Lib\site-packages\altair\utils\deprecation.py:65: AltairDeprecationWarning:
+
+'add_selection' is deprecated. Use 'add_params' instead.
+</code></pre>
+</div>
+<div class="cell-output cell-output-display" data-execution_count="53">
+
+<style>
+  #altair-viz-d743acf9955d43ac9b531ecd3bfc3427.vega-embed {
+    width: 100%;
+    display: flex;
+  }
+
+  #altair-viz-d743acf9955d43ac9b531ecd3bfc3427.vega-embed details,
+  #altair-viz-d743acf9955d43ac9b531ecd3bfc3427.vega-embed details summary {
+    position: relative;
+  }
+</style>
+<div id="altair-viz-d743acf9955d43ac9b531ecd3bfc3427"></div>
+<script type="text/javascript">
+  var VEGA_DEBUG = (typeof VEGA_DEBUG == "undefined") ? {} : VEGA_DEBUG;
+  (function(spec, embedOpt){
+    let outputDiv = document.currentScript.previousElementSibling;
+    if (outputDiv.id !== "altair-viz-d743acf9955d43ac9b531ecd3bfc3427") {
+      outputDiv = document.getElementById("altair-viz-d743acf9955d43ac9b531ecd3bfc3427");
+    }
+    const paths = {
+      "vega": "https://cdn.jsdelivr.net/npm/vega@5?noext",
+      "vega-lib": "https://cdn.jsdelivr.net/npm/vega-lib?noext",
+      "vega-lite": "https://cdn.jsdelivr.net/npm/vega-lite@5.8.0?noext",
+      "vega-embed": "https://cdn.jsdelivr.net/npm/vega-embed@6?noext",
+    };
+
+    function maybeLoadScript(lib, version) {
+      var key = `${lib.replace("-", "")}_version`;
+      return (VEGA_DEBUG[key] == version) ?
+        Promise.resolve(paths[lib]) :
+        new Promise(function(resolve, reject) {
+          var s = document.createElement('script');
+          document.getElementsByTagName("head")[0].appendChild(s);
+          s.async = true;
+          s.onload = () => {
+            VEGA_DEBUG[key] = version;
+            return resolve(paths[lib]);
+          };
+          s.onerror = () => reject(`Error loading script: ${paths[lib]}`);
+          s.src = paths[lib];
+        });
+    }
+
+    function showError(err) {
+      outputDiv.innerHTML = `<div class="error" style="color:red;">${err}</div>`;
+      throw err;
+    }
+
+    function displayChart(vegaEmbed) {
+      vegaEmbed(outputDiv, spec, embedOpt)
+        .catch(err => showError(`Javascript Error: ${err.message}<br>This usually means there's a typo in your chart specification. See the javascript console for the full traceback.`));
+    }
+
+    if(typeof define === "function" && define.amd) {
+      requirejs.config({paths});
+      require(["vega-embed"], displayChart, err => showError(`Error loading script: ${err.message}`));
+    } else {
+      maybeLoadScript("vega", "5")
+        .then(() => maybeLoadScript("vega-lite", "5.8.0"))
+        .then(() => maybeLoadScript("vega-embed", "6"))
+        .catch(showError)
+        .then(() => displayChart(vegaEmbed));
+    }
+  })({"config": {"view": {"continuousWidth": 300, "continuousHeight": 300}}, "hconcat": [{"mark": {"type": "geoshape", "stroke": "black"}, "encoding": {"color": {"field": "GPA", "scale": {"range": ["#00072D", "#0A2472", "#0E6BA8", "#A6E1FA", "#99ABC5", "#8B748F", "#6F0624"]}, "type": "quantitative"}, "opacity": {"condition": {"test": "isValid(datum.GPA)", "value": 1}, "value": 0.2}, "tooltip": [{"field": "State", "type": "nominal"}, {"field": "GPA", "type": "quantitative"}]}, "height": 200, "name": "view_7", "title": "Admission Rates by State", "transform": [{"lookup": "id", "from": {"data": {"name": "data-d3d0ed36e8c2fb29c3c0f0fd583e90d7"}, "key": "StateID", "fields": ["State", "GPA", "WorkExp", "TestScore", "WritingScore", "VolunteerLevel", "State_Abbr", "StateID"]}}, {"calculate": "datum.variable || \"GPA\"", "as": "variable"}, {"filter": {"param": "Select Variable"}}], "width": 333}, {"mark": {"type": "geoshape", "stroke": "black"}, "encoding": {"color": {"field": "GPA", "scale": {"range": ["#00072D", "#0A2472", "#0E6BA8", "#A6E1FA", "#99ABC5", "#8B748F", "#6F0624"]}, "type": "quantitative"}, "opacity": {"condition": {"test": "isValid(datum.GPA)", "value": 1}, "value": 0.2}, "tooltip": [{"field": "State", "type": "nominal"}, {"field": "GPA", "type": "quantitative"}]}, "height": 200, "name": "view_8", "title": "Rejection Rates by State", "transform": [{"lookup": "id", "from": {"data": {"name": "data-43214490c46030f59366cc15e9329957"}, "key": "StateID", "fields": ["State", "GPA", "WorkExp", "TestScore", "WritingScore", "VolunteerLevel", "State_Abbr", "StateID"]}}, {"calculate": "datum.variable || \"GPA\"", "as": "variable"}, {"filter": {"param": "Select Variable"}}], "width": 333}], "data": {"url": "https://raw.githubusercontent.com/vega/vega-datasets/master/data/us-10m.json", "format": {"feature": "states", "type": "topojson"}}, "params": [{"name": "Select Variable", "select": {"type": "point", "fields": ["variable"]}, "bind": {"input": "select", "options": ["State", "GPA", "WorkExp", "TestScore", "WritingScore", "VolunteerLevel", "State_Abbr"]}, "views": ["view_7", "view_8"]}], "$schema": "https://vega.github.io/schema/vega-lite/v5.8.0.json", "datasets": {"data-d3d0ed36e8c2fb29c3c0f0fd583e90d7": [{"State": "California", "GPA": 3.764444444444445, "WorkExp": 3.111111111111111, "TestScore": 946.4444444444445, "WritingScore": 94.44444444444444, "VolunteerLevel": 2.5555555555555554, "State_Abbr": "CA", "StateID": 6}, {"State": "Colorado", "GPA": 3.71875, "WorkExp": 1.575, "TestScore": 967.375, "WritingScore": 82.375, "VolunteerLevel": 2.0, "State_Abbr": "CO", "StateID": 8}, {"State": "Florida", "GPA": 3.7318181818181815, "WorkExp": 1.5909090909090908, "TestScore": 966.1818181818181, "WritingScore": 87.18181818181819, "VolunteerLevel": 2.1818181818181817, "State_Abbr": "FL", "StateID": 12}, {"State": "Utah", "GPA": 3.78, "WorkExp": 1.2, "TestScore": 968.0, "WritingScore": 87.0, "VolunteerLevel": 2.0, "State_Abbr": "UT", "StateID": 49}], "data-43214490c46030f59366cc15e9329957": [{"State": "California", "GPA": 2.34, "WorkExp": 0.8, "TestScore": 754.0, "WritingScore": 76.0, "VolunteerLevel": 1.0, "State_Abbr": "CA", "StateID": 6}, {"State": "Colorado", "GPA": 3.1166666666666667, "WorkExp": 2.183333333333333, "TestScore": 762.6666666666666, "WritingScore": 74.0, "VolunteerLevel": 2.6666666666666665, "State_Abbr": "CO", "StateID": 8}, {"State": "Florida", "GPA": 3.4853846153846155, "WorkExp": 2.223076923076923, "TestScore": 799.2307692307693, "WritingScore": 72.84615384615384, "VolunteerLevel": 2.6153846153846154, "State_Abbr": "FL", "StateID": 12}, {"State": "Mississippi", "GPA": 2.91, "WorkExp": 6.2, "TestScore": 753.0, "WritingScore": 77.0, "VolunteerLevel": 1.0, "State_Abbr": "MS", "StateID": 28}, {"State": "Oregon", "GPA": 2.9, "WorkExp": 0.9, "TestScore": 769.0, "WritingScore": 87.0, "VolunteerLevel": 4.0, "State_Abbr": "OR", "StateID": 41}, {"State": "Utah", "GPA": 3.17, "WorkExp": 1.1, "TestScore": 768.5, "WritingScore": 69.5, "VolunteerLevel": 1.5, "State_Abbr": "UT", "StateID": 49}, {"State": "Virginia", "GPA": 3.1425, "WorkExp": 2.375, "TestScore": 766.0, "WritingScore": 76.5, "VolunteerLevel": 3.25, "State_Abbr": "VA", "StateID": 51}]}}, {"mode": "vega-lite"});
+</script>
+</div>
+</div>
+<div class="cell" data-execution_count="180">
+<div class="sourceCode cell-code" id="cb45"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb45-1"><a href="#cb45-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> vega_datasets <span class="im">import</span> data </span>
+<span id="cb45-2"><a href="#cb45-2" aria-hidden="true" tabindex="-1"></a>decision_state <span class="op">=</span> df.groupby([<span class="st">'Decision'</span>, <span class="st">'State'</span>])[[<span class="st">"GPA"</span>]].count().reset_index()</span>
+<span id="cb45-3"><a href="#cb45-3" aria-hidden="true" tabindex="-1"></a>decision_state <span class="op">=</span> decision_state.rename(columns<span class="op">=</span>{<span class="st">'GPA'</span>:<span class="st">'StateCount'</span>})</span>
+<span id="cb45-4"><a href="#cb45-4" aria-hidden="true" tabindex="-1"></a>decision_state[<span class="st">'DecisionCount'</span>] <span class="op">=</span> decision_state.groupby(<span class="st">'Decision'</span>)[<span class="st">'StateCount'</span>].transform(<span class="st">'sum'</span>)</span>
+<span id="cb45-5"><a href="#cb45-5" aria-hidden="true" tabindex="-1"></a>decision_state[<span class="st">'Rate'</span>] <span class="op">=</span> decision_state[<span class="st">'StateCount'</span>] <span class="op">/</span> decision_state[<span class="st">'DecisionCount'</span>] <span class="op">*</span> <span class="dv">100</span></span>
+<span id="cb45-6"><a href="#cb45-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb45-7"><a href="#cb45-7" aria-hidden="true" tabindex="-1"></a>state_id_dict <span class="op">=</span> <span class="bu">dict</span>(<span class="bu">zip</span>(data.population_engineers_hurricanes()[<span class="st">"state"</span>], data.population_engineers_hurricanes()[<span class="st">"id"</span>]))</span>
+<span id="cb45-8"><a href="#cb45-8" aria-hidden="true" tabindex="-1"></a>decision_state[<span class="st">"StateID"</span>] <span class="op">=</span> decision_state[<span class="st">"State"</span>].<span class="bu">map</span>(state_id_dict)</span>
+<span id="cb45-9"><a href="#cb45-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb45-10"><a href="#cb45-10" aria-hidden="true" tabindex="-1"></a>decision_state</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="180">
+<div>
+
+
+<table class="dataframe table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">Decision</th>
+<th data-quarto-table-cell-role="th">State</th>
+<th data-quarto-table-cell-role="th">StateCount</th>
+<th data-quarto-table-cell-role="th">DecisionCount</th>
+<th data-quarto-table-cell-role="th">Rate</th>
+<th data-quarto-table-cell-role="th">StateID</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">0</td>
+<td>Admit</td>
+<td>California</td>
+<td>9</td>
+<td>29</td>
+<td>31.034483</td>
+<td>6</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">1</td>
+<td>Admit</td>
+<td>Colorado</td>
+<td>8</td>
+<td>29</td>
+<td>27.586207</td>
+<td>8</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">2</td>
+<td>Admit</td>
+<td>Florida</td>
+<td>11</td>
+<td>29</td>
+<td>37.931034</td>
+<td>12</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">3</td>
+<td>Admit</td>
+<td>Utah</td>
+<td>1</td>
+<td>29</td>
+<td>3.448276</td>
+<td>49</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">4</td>
+<td>Decline</td>
+<td>California</td>
+<td>1</td>
+<td>28</td>
+<td>3.571429</td>
+<td>6</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">5</td>
+<td>Decline</td>
+<td>Colorado</td>
+<td>6</td>
+<td>28</td>
+<td>21.428571</td>
+<td>8</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">6</td>
+<td>Decline</td>
+<td>Florida</td>
+<td>13</td>
+<td>28</td>
+<td>46.428571</td>
+<td>12</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">7</td>
+<td>Decline</td>
+<td>Mississippi</td>
+<td>1</td>
+<td>28</td>
+<td>3.571429</td>
+<td>28</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">8</td>
+<td>Decline</td>
+<td>Oregon</td>
+<td>1</td>
+<td>28</td>
+<td>3.571429</td>
+<td>41</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">9</td>
+<td>Decline</td>
+<td>Utah</td>
+<td>2</td>
+<td>28</td>
+<td>7.142857</td>
+<td>49</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">10</td>
+<td>Decline</td>
+<td>Virginia</td>
+<td>4</td>
+<td>28</td>
+<td>14.285714</td>
+<td>51</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">11</td>
+<td>Waitlist</td>
+<td>Alabama</td>
+<td>1</td>
+<td>23</td>
+<td>4.347826</td>
+<td>1</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">12</td>
+<td>Waitlist</td>
+<td>California</td>
+<td>2</td>
+<td>23</td>
+<td>8.695652</td>
+<td>6</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">13</td>
+<td>Waitlist</td>
+<td>Colorado</td>
+<td>4</td>
+<td>23</td>
+<td>17.391304</td>
+<td>8</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">14</td>
+<td>Waitlist</td>
+<td>Florida</td>
+<td>11</td>
+<td>23</td>
+<td>47.826087</td>
+<td>12</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">15</td>
+<td>Waitlist</td>
+<td>New York</td>
+<td>1</td>
+<td>23</td>
+<td>4.347826</td>
+<td>36</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">16</td>
+<td>Waitlist</td>
+<td>Utah</td>
+<td>3</td>
+<td>23</td>
+<td>13.043478</td>
+<td>49</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">17</td>
+<td>Waitlist</td>
+<td>Vermont</td>
+<td>1</td>
+<td>23</td>
+<td>4.347826</td>
+<td>50</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+<div class="cell" data-execution_count="184">
+<div class="sourceCode cell-code" id="cb46"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb46-1"><a href="#cb46-1" aria-hidden="true" tabindex="-1"></a>admit_states <span class="op">=</span> decision_state[decision_state[<span class="st">'Decision'</span>] <span class="op">==</span> <span class="st">"Admit"</span>]</span>
+<span id="cb46-2"><a href="#cb46-2" aria-hidden="true" tabindex="-1"></a>decline_states <span class="op">=</span> decision_state[decision_state[<span class="st">'Decision'</span>] <span class="op">==</span> <span class="st">"Decline"</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell" data-execution_count="216">
+<div class="sourceCode cell-code" id="cb47"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb47-1"><a href="#cb47-1" aria-hidden="true" tabindex="-1"></a>states <span class="op">=</span> alt.topo_feature(<span class="st">'https://raw.githubusercontent.com/vega/vega-datasets/master/data/us-10m.json'</span>, <span class="st">'states'</span>)</span>
+<span id="cb47-2"><a href="#cb47-2" aria-hidden="true" tabindex="-1"></a>click <span class="op">=</span> alt.selection_multi(fields <span class="op">=</span> [<span class="st">"State"</span>])</span>
+<span id="cb47-3"><a href="#cb47-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb47-4"><a href="#cb47-4" aria-hidden="true" tabindex="-1"></a>admit_map <span class="op">=</span> (</span>
+<span id="cb47-5"><a href="#cb47-5" aria-hidden="true" tabindex="-1"></a>    alt.Chart(states)</span>
+<span id="cb47-6"><a href="#cb47-6" aria-hidden="true" tabindex="-1"></a>    .mark_geoshape(stroke<span class="op">=</span><span class="st">'black'</span>)</span>
+<span id="cb47-7"><a href="#cb47-7" aria-hidden="true" tabindex="-1"></a>    .encode(</span>
+<span id="cb47-8"><a href="#cb47-8" aria-hidden="true" tabindex="-1"></a>        color<span class="op">=</span>alt.Color(<span class="st">"Rate:Q"</span>, scale<span class="op">=</span>alt.Scale(<span class="bu">range</span><span class="op">=</span>custom_palette)),</span>
+<span id="cb47-9"><a href="#cb47-9" aria-hidden="true" tabindex="-1"></a>        opacity<span class="op">=</span>alt.condition(<span class="st">'isValid(datum.Rate)'</span>, alt.value(<span class="dv">1</span>), alt.value(<span class="fl">0.2</span>))</span>
+<span id="cb47-10"><a href="#cb47-10" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb47-11"><a href="#cb47-11" aria-hidden="true" tabindex="-1"></a>    .transform_lookup(</span>
+<span id="cb47-12"><a href="#cb47-12" aria-hidden="true" tabindex="-1"></a>        lookup<span class="op">=</span><span class="st">"id"</span>,</span>
+<span id="cb47-13"><a href="#cb47-13" aria-hidden="true" tabindex="-1"></a>        from_<span class="op">=</span>alt.LookupData(admit_states, <span class="st">"StateID"</span>, <span class="bu">list</span>(admit_states.columns))</span>
+<span id="cb47-14"><a href="#cb47-14" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb47-15"><a href="#cb47-15" aria-hidden="true" tabindex="-1"></a>    .properties(width<span class="op">=</span><span class="dv">500</span>, height<span class="op">=</span><span class="dv">300</span>, title<span class="op">=</span><span class="st">"Admission Rates by State"</span>)</span>
+<span id="cb47-16"><a href="#cb47-16" aria-hidden="true" tabindex="-1"></a>    .add_selection(click)</span>
+<span id="cb47-17"><a href="#cb47-17" aria-hidden="true" tabindex="-1"></a>    .project(<span class="bu">type</span><span class="op">=</span><span class="st">"albersUsa"</span>)</span>
+<span id="cb47-18"><a href="#cb47-18" aria-hidden="true" tabindex="-1"></a>    .encode(tooltip<span class="op">=</span>[<span class="st">"properties.name:N"</span>, <span class="st">"Rate:Q"</span>])</span>
+<span id="cb47-19"><a href="#cb47-19" aria-hidden="true" tabindex="-1"></a>    .interactive()</span>
+<span id="cb47-20"><a href="#cb47-20" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb47-21"><a href="#cb47-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb47-22"><a href="#cb47-22" aria-hidden="true" tabindex="-1"></a><span class="co"># Display the admit_map visualization</span></span>
+<span id="cb47-23"><a href="#cb47-23" aria-hidden="true" tabindex="-1"></a>admit_map</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="216">
+
+<style>
+  #altair-viz-7a65443a87b24346906d5de9a82a2b7e.vega-embed {
+    width: 100%;
+    display: flex;
+  }
+
+  #altair-viz-7a65443a87b24346906d5de9a82a2b7e.vega-embed details,
+  #altair-viz-7a65443a87b24346906d5de9a82a2b7e.vega-embed details summary {
+    position: relative;
+  }
+</style>
+<div id="altair-viz-7a65443a87b24346906d5de9a82a2b7e"></div>
+<script type="text/javascript">
+  var VEGA_DEBUG = (typeof VEGA_DEBUG == "undefined") ? {} : VEGA_DEBUG;
+  (function(spec, embedOpt){
+    let outputDiv = document.currentScript.previousElementSibling;
+    if (outputDiv.id !== "altair-viz-7a65443a87b24346906d5de9a82a2b7e") {
+      outputDiv = document.getElementById("altair-viz-7a65443a87b24346906d5de9a82a2b7e");
+    }
+    const paths = {
+      "vega": "https://cdn.jsdelivr.net/npm/vega@5?noext",
+      "vega-lib": "https://cdn.jsdelivr.net/npm/vega-lib?noext",
+      "vega-lite": "https://cdn.jsdelivr.net/npm/vega-lite@5.8.0?noext",
+      "vega-embed": "https://cdn.jsdelivr.net/npm/vega-embed@6?noext",
+    };
+
+    function maybeLoadScript(lib, version) {
+      var key = `${lib.replace("-", "")}_version`;
+      return (VEGA_DEBUG[key] == version) ?
+        Promise.resolve(paths[lib]) :
+        new Promise(function(resolve, reject) {
+          var s = document.createElement('script');
+          document.getElementsByTagName("head")[0].appendChild(s);
+          s.async = true;
+          s.onload = () => {
+            VEGA_DEBUG[key] = version;
+            return resolve(paths[lib]);
+          };
+          s.onerror = () => reject(`Error loading script: ${paths[lib]}`);
+          s.src = paths[lib];
+        });
+    }
+
+    function showError(err) {
+      outputDiv.innerHTML = `<div class="error" style="color:red;">${err}</div>`;
+      throw err;
+    }
+
+    function displayChart(vegaEmbed) {
+      vegaEmbed(outputDiv, spec, embedOpt)
+        .catch(err => showError(`Javascript Error: ${err.message}<br>This usually means there's a typo in your chart specification. See the javascript console for the full traceback.`));
+    }
+
+    if(typeof define === "function" && define.amd) {
+      requirejs.config({paths});
+      require(["vega-embed"], displayChart, err => showError(`Error loading script: ${err.message}`));
+    } else {
+      maybeLoadScript("vega", "5")
+        .then(() => maybeLoadScript("vega-lite", "5.8.0"))
+        .then(() => maybeLoadScript("vega-embed", "6"))
+        .catch(showError)
+        .then(() => displayChart(vegaEmbed));
+    }
+  })({"config": {"view": {"continuousWidth": 300, "continuousHeight": 300}}, "data": {"url": "https://raw.githubusercontent.com/vega/vega-datasets/master/data/us-10m.json", "format": {"feature": "states", "type": "topojson"}}, "mark": {"type": "geoshape", "stroke": "black"}, "encoding": {"color": {"field": "Rate", "scale": {"range": ["#00072D", "#0A2472", "#0E6BA8", "#A6E1FA", "#99ABC5", "#8B748F", "#6F0624"]}, "type": "quantitative"}, "opacity": {"condition": {"test": "isValid(datum.Rate)", "value": 1}, "value": 0.2}, "tooltip": [{"field": "properties.name", "type": "nominal"}, {"field": "Rate", "type": "quantitative"}]}, "height": 300, "params": [{"name": "param_57", "select": {"type": "point", "fields": ["State"]}}, {"name": "param_58", "select": {"type": "interval", "encodings": ["x", "y"]}, "bind": "scales"}], "projection": {"type": "albersUsa"}, "title": "Admission Rates by State", "transform": [{"lookup": "id", "from": {"data": {"name": "data-503a74368ebe062f15f70c03eb2f77e7"}, "key": "StateID", "fields": ["Decision", "State", "StateCount", "DecisionCount", "Rate", "StateID"]}}], "width": 500, "$schema": "https://vega.github.io/schema/vega-lite/v5.8.0.json", "datasets": {"data-503a74368ebe062f15f70c03eb2f77e7": [{"Decision": "Admit", "State": "California", "StateCount": 9, "DecisionCount": 29, "Rate": 31.03448275862069, "StateID": 6}, {"Decision": "Admit", "State": "Colorado", "StateCount": 8, "DecisionCount": 29, "Rate": 27.586206896551722, "StateID": 8}, {"Decision": "Admit", "State": "Florida", "StateCount": 11, "DecisionCount": 29, "Rate": 37.93103448275862, "StateID": 12}, {"Decision": "Admit", "State": "Utah", "StateCount": 1, "DecisionCount": 29, "Rate": 3.4482758620689653, "StateID": 49}]}}, {"mode": "vega-lite"});
+</script>
+</div>
+</div>
+<div class="cell" data-execution_count="223">
+<div class="sourceCode cell-code" id="cb48"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb48-1"><a href="#cb48-1" aria-hidden="true" tabindex="-1"></a>states <span class="op">=</span> alt.topo_feature(<span class="st">'https://raw.githubusercontent.com/vega/vega-datasets/master/data/us-10m.json'</span>, <span class="st">'states'</span>)</span>
+<span id="cb48-2"><a href="#cb48-2" aria-hidden="true" tabindex="-1"></a>click <span class="op">=</span> alt.selection_multi(fields <span class="op">=</span> [<span class="st">"State"</span>])</span>
+<span id="cb48-3"><a href="#cb48-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb48-4"><a href="#cb48-4" aria-hidden="true" tabindex="-1"></a>existing_states <span class="op">=</span> alt.Chart(states).mark_geoshape(stroke<span class="op">=</span><span class="st">'black'</span>).encode(</span>
+<span id="cb48-5"><a href="#cb48-5" aria-hidden="true" tabindex="-1"></a>    color <span class="op">=</span> alt.Color(<span class="st">"Rate:Q"</span>, scale<span class="op">=</span>alt.Scale(<span class="bu">range</span><span class="op">=</span>custom_palette)),</span>
+<span id="cb48-6"><a href="#cb48-6" aria-hidden="true" tabindex="-1"></a>    tooltip <span class="op">=</span> [<span class="st">"State:N"</span>, <span class="st">"Rate:Q"</span>],</span>
+<span id="cb48-7"><a href="#cb48-7" aria-hidden="true" tabindex="-1"></a>    opacity <span class="op">=</span> alt.condition(<span class="st">'isValid(datum.Rate)'</span>, alt.value(<span class="dv">1</span>), alt.value(<span class="fl">0.2</span>)),</span>
+<span id="cb48-8"><a href="#cb48-8" aria-hidden="true" tabindex="-1"></a>).transform_lookup(</span>
+<span id="cb48-9"><a href="#cb48-9" aria-hidden="true" tabindex="-1"></a>    lookup <span class="op">=</span> <span class="st">"id"</span>,</span>
+<span id="cb48-10"><a href="#cb48-10" aria-hidden="true" tabindex="-1"></a>    from_ <span class="op">=</span> alt.LookupData(admit_states, <span class="st">"StateID"</span>, <span class="bu">list</span>(admit_states.columns))</span>
+<span id="cb48-11"><a href="#cb48-11" aria-hidden="true" tabindex="-1"></a>).properties(width <span class="op">=</span> <span class="dv">333</span>, height <span class="op">=</span> <span class="dv">200</span>, title<span class="op">=</span><span class="st">"Admission Rates by State"</span>).add_selection(click).project(<span class="bu">type</span> <span class="op">=</span> <span class="st">"albersUsa"</span>).interactive()</span>
+<span id="cb48-12"><a href="#cb48-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb48-13"><a href="#cb48-13" aria-hidden="true" tabindex="-1"></a>missing_states <span class="op">=</span> (</span>
+<span id="cb48-14"><a href="#cb48-14" aria-hidden="true" tabindex="-1"></a>    alt.Chart(states)</span>
+<span id="cb48-15"><a href="#cb48-15" aria-hidden="true" tabindex="-1"></a>    .mark_geoshape(fill <span class="op">=</span> <span class="st">"grey"</span>, stroke <span class="op">=</span> <span class="st">"white"</span>)</span>
+<span id="cb48-16"><a href="#cb48-16" aria-hidden="true" tabindex="-1"></a>    .encode(opacity<span class="op">=</span>alt.condition(<span class="st">"isValid(datum.Rate)"</span>, alt.value(<span class="dv">0</span>), alt.value(<span class="fl">0.2</span>))).add_selection(click).project(<span class="bu">type</span> <span class="op">=</span> <span class="st">"albersUsa"</span>)</span>
+<span id="cb48-17"><a href="#cb48-17" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb48-18"><a href="#cb48-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb48-19"><a href="#cb48-19" aria-hidden="true" tabindex="-1"></a>admit_map <span class="op">=</span> existing_states <span class="op">+</span> missing_states</span>
+<span id="cb48-20"><a href="#cb48-20" aria-hidden="true" tabindex="-1"></a>admit_map <span class="op">=</span> admit_map.encode(</span>
+<span id="cb48-21"><a href="#cb48-21" aria-hidden="true" tabindex="-1"></a>    tooltip<span class="op">=</span> [<span class="st">"State:N"</span>, <span class="st">"Rate:Q"</span>]</span>
+<span id="cb48-22"><a href="#cb48-22" aria-hidden="true" tabindex="-1"></a>    ).transform_lookup(</span>
+<span id="cb48-23"><a href="#cb48-23" aria-hidden="true" tabindex="-1"></a>        lookup<span class="op">=</span><span class="st">"id"</span>,</span>
+<span id="cb48-24"><a href="#cb48-24" aria-hidden="true" tabindex="-1"></a>        from_<span class="op">=</span>alt.LookupData(admit_states, <span class="st">"StateID"</span>, <span class="bu">list</span>(admit_states.columns))</span>
+<span id="cb48-25"><a href="#cb48-25" aria-hidden="true" tabindex="-1"></a>    ).interactive()</span>
+<span id="cb48-26"><a href="#cb48-26" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb48-27"><a href="#cb48-27" aria-hidden="true" tabindex="-1"></a>existing_states <span class="op">=</span> alt.Chart(states).mark_geoshape(stroke<span class="op">=</span><span class="st">'black'</span>).encode(</span>
+<span id="cb48-28"><a href="#cb48-28" aria-hidden="true" tabindex="-1"></a>    color <span class="op">=</span> alt.Color(<span class="st">"Rate:Q"</span>, scale<span class="op">=</span>alt.Scale(<span class="bu">range</span><span class="op">=</span>custom_palette)),</span>
+<span id="cb48-29"><a href="#cb48-29" aria-hidden="true" tabindex="-1"></a>    tooltip <span class="op">=</span> [<span class="st">"State:N"</span>, <span class="st">"Rate:Q"</span>],</span>
+<span id="cb48-30"><a href="#cb48-30" aria-hidden="true" tabindex="-1"></a>    opacity <span class="op">=</span> alt.condition(<span class="st">'isValid(datum.Rate)'</span>, alt.value(<span class="dv">1</span>), alt.value(<span class="fl">0.2</span>)),</span>
+<span id="cb48-31"><a href="#cb48-31" aria-hidden="true" tabindex="-1"></a>).transform_lookup(</span>
+<span id="cb48-32"><a href="#cb48-32" aria-hidden="true" tabindex="-1"></a>    lookup <span class="op">=</span> <span class="st">"id"</span>,</span>
+<span id="cb48-33"><a href="#cb48-33" aria-hidden="true" tabindex="-1"></a>    from_ <span class="op">=</span> alt.LookupData(decline_states, <span class="st">"StateID"</span>, <span class="bu">list</span>(decline_states.columns))</span>
+<span id="cb48-34"><a href="#cb48-34" aria-hidden="true" tabindex="-1"></a>).properties(width <span class="op">=</span> <span class="dv">333</span>, height <span class="op">=</span> <span class="dv">200</span>, title<span class="op">=</span><span class="st">"Rejection Rates by State"</span>).add_selection(click).project(<span class="bu">type</span> <span class="op">=</span> <span class="st">"albersUsa"</span>).interactive()</span>
+<span id="cb48-35"><a href="#cb48-35" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb48-36"><a href="#cb48-36" aria-hidden="true" tabindex="-1"></a>missing_states <span class="op">=</span> (</span>
+<span id="cb48-37"><a href="#cb48-37" aria-hidden="true" tabindex="-1"></a>    alt.Chart(states)</span>
+<span id="cb48-38"><a href="#cb48-38" aria-hidden="true" tabindex="-1"></a>    .mark_geoshape(fill <span class="op">=</span> <span class="st">"grey"</span>, stroke <span class="op">=</span> <span class="st">"white"</span>)</span>
+<span id="cb48-39"><a href="#cb48-39" aria-hidden="true" tabindex="-1"></a>    .encode(opacity<span class="op">=</span>alt.condition(<span class="st">"isValid(datum.Rate)"</span>, alt.value(<span class="dv">0</span>), alt.value(<span class="fl">0.2</span>))).add_selection(click).project(<span class="bu">type</span> <span class="op">=</span> <span class="st">"albersUsa"</span>)</span>
+<span id="cb48-40"><a href="#cb48-40" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb48-41"><a href="#cb48-41" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb48-42"><a href="#cb48-42" aria-hidden="true" tabindex="-1"></a>decline_map <span class="op">=</span> existing_states <span class="op">+</span> missing_states</span>
+<span id="cb48-43"><a href="#cb48-43" aria-hidden="true" tabindex="-1"></a>decline_map <span class="op">=</span> decline_map.encode(</span>
+<span id="cb48-44"><a href="#cb48-44" aria-hidden="true" tabindex="-1"></a>    tooltip<span class="op">=</span> [<span class="st">"State:N"</span>, <span class="st">"Rate:Q"</span>]</span>
+<span id="cb48-45"><a href="#cb48-45" aria-hidden="true" tabindex="-1"></a>    ).transform_lookup(</span>
+<span id="cb48-46"><a href="#cb48-46" aria-hidden="true" tabindex="-1"></a>        lookup<span class="op">=</span><span class="st">"id"</span>,</span>
+<span id="cb48-47"><a href="#cb48-47" aria-hidden="true" tabindex="-1"></a>        from_<span class="op">=</span>alt.LookupData(decline_states, <span class="st">"StateID"</span>, <span class="bu">list</span>(decline_states.columns))</span>
+<span id="cb48-48"><a href="#cb48-48" aria-hidden="true" tabindex="-1"></a>    ).interactive()</span>
+<span id="cb48-49"><a href="#cb48-49" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb48-50"><a href="#cb48-50" aria-hidden="true" tabindex="-1"></a>admit_map <span class="op">|</span> decline_map</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="223">
+
+<style>
+  #altair-viz-52983d16eefa41f0ae8276740a219a19.vega-embed {
+    width: 100%;
+    display: flex;
+  }
+
+  #altair-viz-52983d16eefa41f0ae8276740a219a19.vega-embed details,
+  #altair-viz-52983d16eefa41f0ae8276740a219a19.vega-embed details summary {
+    position: relative;
+  }
+</style>
+<div id="altair-viz-52983d16eefa41f0ae8276740a219a19"></div>
+<script type="text/javascript">
+  var VEGA_DEBUG = (typeof VEGA_DEBUG == "undefined") ? {} : VEGA_DEBUG;
+  (function(spec, embedOpt){
+    let outputDiv = document.currentScript.previousElementSibling;
+    if (outputDiv.id !== "altair-viz-52983d16eefa41f0ae8276740a219a19") {
+      outputDiv = document.getElementById("altair-viz-52983d16eefa41f0ae8276740a219a19");
+    }
+    const paths = {
+      "vega": "https://cdn.jsdelivr.net/npm/vega@5?noext",
+      "vega-lib": "https://cdn.jsdelivr.net/npm/vega-lib?noext",
+      "vega-lite": "https://cdn.jsdelivr.net/npm/vega-lite@5.8.0?noext",
+      "vega-embed": "https://cdn.jsdelivr.net/npm/vega-embed@6?noext",
+    };
+
+    function maybeLoadScript(lib, version) {
+      var key = `${lib.replace("-", "")}_version`;
+      return (VEGA_DEBUG[key] == version) ?
+        Promise.resolve(paths[lib]) :
+        new Promise(function(resolve, reject) {
+          var s = document.createElement('script');
+          document.getElementsByTagName("head")[0].appendChild(s);
+          s.async = true;
+          s.onload = () => {
+            VEGA_DEBUG[key] = version;
+            return resolve(paths[lib]);
+          };
+          s.onerror = () => reject(`Error loading script: ${paths[lib]}`);
+          s.src = paths[lib];
+        });
+    }
+
+    function showError(err) {
+      outputDiv.innerHTML = `<div class="error" style="color:red;">${err}</div>`;
+      throw err;
+    }
+
+    function displayChart(vegaEmbed) {
+      vegaEmbed(outputDiv, spec, embedOpt)
+        .catch(err => showError(`Javascript Error: ${err.message}<br>This usually means there's a typo in your chart specification. See the javascript console for the full traceback.`));
+    }
+
+    if(typeof define === "function" && define.amd) {
+      requirejs.config({paths});
+      require(["vega-embed"], displayChart, err => showError(`Error loading script: ${err.message}`));
+    } else {
+      maybeLoadScript("vega", "5")
+        .then(() => maybeLoadScript("vega-lite", "5.8.0"))
+        .then(() => maybeLoadScript("vega-embed", "6"))
+        .catch(showError)
+        .then(() => displayChart(vegaEmbed));
+    }
+  })({"config": {"view": {"continuousWidth": 300, "continuousHeight": 300}}, "hconcat": [{"layer": [{"mark": {"type": "geoshape", "stroke": "black"}, "encoding": {"color": {"field": "Rate", "scale": {"range": ["#00072D", "#0A2472", "#0E6BA8", "#A6E1FA", "#99ABC5", "#8B748F", "#6F0624"]}, "type": "quantitative"}, "opacity": {"condition": {"test": "isValid(datum.Rate)", "value": 1}, "value": 0.2}, "tooltip": [{"field": "State", "type": "nominal"}, {"field": "Rate", "type": "quantitative"}]}, "name": "view_67", "projection": {"type": "albersUsa"}, "title": "Admission Rates by State", "transform": [{"lookup": "id", "from": {"data": {"name": "data-503a74368ebe062f15f70c03eb2f77e7"}, "key": "StateID", "fields": ["Decision", "State", "StateCount", "DecisionCount", "Rate", "StateID"]}}]}, {"mark": {"type": "geoshape", "fill": "grey", "stroke": "white"}, "encoding": {"opacity": {"condition": {"test": "isValid(datum.Rate)", "value": 0}, "value": 0.2}}, "projection": {"type": "albersUsa"}}], "encoding": {"tooltip": [{"field": "State", "type": "nominal"}, {"field": "Rate", "type": "quantitative"}]}, "height": 200, "transform": [{"lookup": "id", "from": {"data": {"name": "data-503a74368ebe062f15f70c03eb2f77e7"}, "key": "StateID", "fields": ["Decision", "State", "StateCount", "DecisionCount", "Rate", "StateID"]}}], "width": 333}, {"layer": [{"mark": {"type": "geoshape", "stroke": "black"}, "encoding": {"color": {"field": "Rate", "scale": {"range": ["#00072D", "#0A2472", "#0E6BA8", "#A6E1FA", "#99ABC5", "#8B748F", "#6F0624"]}, "type": "quantitative"}, "opacity": {"condition": {"test": "isValid(datum.Rate)", "value": 1}, "value": 0.2}, "tooltip": [{"field": "State", "type": "nominal"}, {"field": "Rate", "type": "quantitative"}]}, "name": "view_68", "projection": {"type": "albersUsa"}, "title": "Rejection Rates by State", "transform": [{"lookup": "id", "from": {"data": {"name": "data-b46b07f67a277f5f7e632f817929b01f"}, "key": "StateID", "fields": ["Decision", "State", "StateCount", "DecisionCount", "Rate", "StateID"]}}]}, {"mark": {"type": "geoshape", "fill": "grey", "stroke": "white"}, "encoding": {"opacity": {"condition": {"test": "isValid(datum.Rate)", "value": 0}, "value": 0.2}}, "projection": {"type": "albersUsa"}}], "encoding": {"tooltip": [{"field": "State", "type": "nominal"}, {"field": "Rate", "type": "quantitative"}]}, "height": 200, "transform": [{"lookup": "id", "from": {"data": {"name": "data-b46b07f67a277f5f7e632f817929b01f"}, "key": "StateID", "fields": ["Decision", "State", "StateCount", "DecisionCount", "Rate", "StateID"]}}], "width": 333}], "data": {"url": "https://raw.githubusercontent.com/vega/vega-datasets/master/data/us-10m.json", "format": {"feature": "states", "type": "topojson"}}, "params": [{"name": "param_83", "select": {"type": "point", "fields": ["State"]}, "views": ["view_67", "view_68"]}, {"name": "param_84", "select": {"type": "interval", "encodings": ["x", "y"]}, "bind": "scales", "views": ["view_67"]}, {"name": "param_85", "select": {"type": "interval", "encodings": ["x", "y"]}, "bind": "scales", "views": ["view_67"]}, {"name": "param_86", "select": {"type": "interval", "encodings": ["x", "y"]}, "bind": "scales", "views": ["view_68"]}, {"name": "param_87", "select": {"type": "interval", "encodings": ["x", "y"]}, "bind": "scales", "views": ["view_68"]}], "$schema": "https://vega.github.io/schema/vega-lite/v5.8.0.json", "datasets": {"data-503a74368ebe062f15f70c03eb2f77e7": [{"Decision": "Admit", "State": "California", "StateCount": 9, "DecisionCount": 29, "Rate": 31.03448275862069, "StateID": 6}, {"Decision": "Admit", "State": "Colorado", "StateCount": 8, "DecisionCount": 29, "Rate": 27.586206896551722, "StateID": 8}, {"Decision": "Admit", "State": "Florida", "StateCount": 11, "DecisionCount": 29, "Rate": 37.93103448275862, "StateID": 12}, {"Decision": "Admit", "State": "Utah", "StateCount": 1, "DecisionCount": 29, "Rate": 3.4482758620689653, "StateID": 49}], "data-b46b07f67a277f5f7e632f817929b01f": [{"Decision": "Decline", "State": "California", "StateCount": 1, "DecisionCount": 28, "Rate": 3.571428571428571, "StateID": 6}, {"Decision": "Decline", "State": "Colorado", "StateCount": 6, "DecisionCount": 28, "Rate": 21.428571428571427, "StateID": 8}, {"Decision": "Decline", "State": "Florida", "StateCount": 13, "DecisionCount": 28, "Rate": 46.42857142857143, "StateID": 12}, {"Decision": "Decline", "State": "Mississippi", "StateCount": 1, "DecisionCount": 28, "Rate": 3.571428571428571, "StateID": 28}, {"Decision": "Decline", "State": "Oregon", "StateCount": 1, "DecisionCount": 28, "Rate": 3.571428571428571, "StateID": 41}, {"Decision": "Decline", "State": "Utah", "StateCount": 2, "DecisionCount": 28, "Rate": 7.142857142857142, "StateID": 49}, {"Decision": "Decline", "State": "Virginia", "StateCount": 4, "DecisionCount": 28, "Rate": 14.285714285714285, "StateID": 51}]}}, {"mode": "vega-lite"});
+</script>
+</div>
+</div>
+</section>
+
+</main>
+<!-- /main column -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    text: function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+  function tippyHover(el, contentFn) {
+    const config = {
+      allowHTML: true,
+      content: contentFn,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start'
+    };
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      return note.innerHTML;
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+</div> <!-- /content -->
+
+
+
+</body></html>
