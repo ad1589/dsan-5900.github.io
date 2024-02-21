@@ -6,9 +6,9 @@ project:
 
 
 website:
-  title: Student Admissions
+  title: Student Internship Admissions
   navbar:
-    background: '#FF5700'
+    background: '#0e6ba8'
     right:
       - icon: github
         href: https://github.com/ad1589/dsan-5900.github.io
@@ -16,11 +16,10 @@ website:
   page-footer:
     right: |
       Made with [Quarto](https://quarto.org/)<br>
-      [View the source at {{< fa brands github >}} GitHub]({{< var course.github >}})
 
 
 format:
   html:
     theme: cosmo
-    css: styles.css
+    css: ../docs/styles.css
     toc: true
