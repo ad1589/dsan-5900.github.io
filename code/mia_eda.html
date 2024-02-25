@@ -1,0 +1,1263 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.2.313">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>mia_eda</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1.6em;
+  vertical-align: middle;
+}
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { color: #008000; } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { color: #008000; font-weight: bold; } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+</style>
+
+
+<script src="mia_eda_files/libs/clipboard/clipboard.min.js"></script>
+<script src="mia_eda_files/libs/quarto-html/quarto.js"></script>
+<script src="mia_eda_files/libs/quarto-html/popper.min.js"></script>
+<script src="mia_eda_files/libs/quarto-html/tippy.umd.min.js"></script>
+<script src="mia_eda_files/libs/quarto-html/anchor.min.js"></script>
+<link href="mia_eda_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="mia_eda_files/libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="mia_eda_files/libs/bootstrap/bootstrap.min.js"></script>
+<link href="mia_eda_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="mia_eda_files/libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" integrity="sha512-c3Nl8+7g4LMSTdrm621y7kf9v3SDPnhxLNhcjFJbKECVnmZHTdo+IRO05sNLTH/D3vA6u1X32ehoLC7WFVdheg==" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js" integrity="sha512-bLT0Qm9VnAYZDflyKcBaQ2gg0hSYNQrJ8RilYldYQ1FxQYoCLtUjuuRuZo+fjqhx/qtq/1itJ0C2ejDxltZVFg==" crossorigin="anonymous"></script>
+<script type="application/javascript">define('jquery', [],function() {return window.jQuery;})</script>
+
+
+</head>
+
+<body class="fullcontent">
+
+<div id="quarto-content" class="page-columns page-rows-contents page-layout-article">
+
+<main class="content" id="quarto-document-content">
+
+
+
+<section id="reading-in-the-data-and-loading-packages" class="level3">
+<h3 class="anchored" data-anchor-id="reading-in-the-data-and-loading-packages">Reading in the data and loading packages</h3>
+<div class="cell" data-execution_count="207">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Import packages</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> altair <span class="im">as</span> alt</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> seaborn <span class="im">as</span> sns</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> plotly.graph_objects <span class="im">as</span> go</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> plotly.express <span class="im">as</span> px</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> mpl_toolkits.mplot3d <span class="im">import</span> Axes3D</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> vega_datasets <span class="im">import</span> data</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell" data-execution_count="208">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Read in clean data</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> pd.read_csv(<span class="st">"../data/clean_data.csv"</span>)</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>df.head()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="208">
+
+<div>
+
+<table class="dataframe table table-sm table-striped">
+  <thead>
+    <tr>
+      <th></th>
+      <th>Decision</th>
+      <th>State</th>
+      <th>GPA</th>
+      <th>WorkExp</th>
+      <th>TestScore</th>
+      <th>WritingScore</th>
+      <th>Gender</th>
+      <th>VolunteerLevel</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>Waitlist</td>
+      <td>Alabama</td>
+      <td>3.41</td>
+      <td>1.2</td>
+      <td>868</td>
+      <td>85</td>
+      <td>0</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>Admit</td>
+      <td>California</td>
+      <td>3.90</td>
+      <td>6.7</td>
+      <td>962</td>
+      <td>100</td>
+      <td>1</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>Admit</td>
+      <td>California</td>
+      <td>3.88</td>
+      <td>1.5</td>
+      <td>967</td>
+      <td>95</td>
+      <td>1</td>
+      <td>5</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>Admit</td>
+      <td>California</td>
+      <td>3.70</td>
+      <td>1.2</td>
+      <td>969</td>
+      <td>94</td>
+      <td>1</td>
+      <td>2</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>Admit</td>
+      <td>California</td>
+      <td>3.70</td>
+      <td>1.4</td>
+      <td>966</td>
+      <td>94</td>
+      <td>1</td>
+      <td>0</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+</div>
+</div>
+</section>
+<section id="eda-visuals" class="level3">
+<h3 class="anchored" data-anchor-id="eda-visuals">EDA Visuals</h3>
+<div class="cell" data-execution_count="209">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>admitted_df <span class="op">=</span> df[df[<span class="st">"Decision"</span>] <span class="op">==</span> <span class="st">"Admit"</span>]</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> middle50(data, colname):</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>    lower_quantile <span class="op">=</span> data[colname].quantile(<span class="fl">0.25</span>)</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>    upper_quantile <span class="op">=</span> data[colname].quantile(<span class="fl">0.75</span>)</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> lower_quantile, upper_quantile</span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"GPA Middle 50%:"</span>, middle50(admitted_df, <span class="st">"GPA"</span>))</span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"WorkExp Middle 50%:"</span>, middle50(admitted_df, <span class="st">"WorkExp"</span>))</span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"TestScore Middle 50%:"</span>, middle50(admitted_df, <span class="st">"TestScore"</span>))</span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"WritingScore Middle 50%:"</span>, middle50(admitted_df, <span class="st">"WritingScore"</span>))</span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Volunteer Level Middle 50%:"</span>, middle50(admitted_df, <span class="st">"VolunteerLevel"</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>GPA Middle 50%: (3.66, 3.87)
+WorkExp Middle 50%: (1.0, 2.2)
+TestScore Middle 50%: (965.0, 969.0)
+WritingScore Middle 50%: (91.0, 97.0)
+Volunteer Level Middle 50%: (1.0, 4.0)</code></pre>
+</div>
+</div>
+<div class="cell" data-execution_count="210">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(admitted_df[admitted_df[<span class="st">"Gender"</span>] <span class="op">==</span> <span class="dv">0</span>].shape[<span class="dv">0</span>]<span class="op">/</span><span class="dv">29</span><span class="op">*</span><span class="dv">100</span>)</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(admitted_df[admitted_df[<span class="st">"Gender"</span>] <span class="op">==</span> <span class="dv">1</span>].shape[<span class="dv">0</span>]<span class="op">/</span><span class="dv">29</span><span class="op">*</span><span class="dv">100</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>44.827586206896555
+55.172413793103445</code></pre>
+</div>
+</div>
+<div class="cell" data-execution_count="211">
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(df[<span class="st">"GPA"</span>].mean())</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(df[<span class="st">"WorkExp"</span>].mean())</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(df[<span class="st">"TestScore"</span>].mean())</span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(df[<span class="st">"WritingScore"</span>].mean())</span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(df[<span class="st">"VolunteerLevel"</span>].mean())</span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"------"</span>)</span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(df[<span class="st">"GPA"</span>].median())</span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(df[<span class="st">"WorkExp"</span>].median())</span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(df[<span class="st">"TestScore"</span>].median())</span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(df[<span class="st">"WritingScore"</span>].median())</span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(df[<span class="st">"VolunteerLevel"</span>].median())</span>
+<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"------"</span>)</span>
+<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(df[<span class="st">"GPA"</span>].<span class="bu">max</span>())</span>
+<span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(df[<span class="st">"WorkExp"</span>].<span class="bu">max</span>())</span>
+<span id="cb7-15"><a href="#cb7-15" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(df[<span class="st">"TestScore"</span>].<span class="bu">max</span>())</span>
+<span id="cb7-16"><a href="#cb7-16" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(df[<span class="st">"WritingScore"</span>].<span class="bu">max</span>())</span>
+<span id="cb7-17"><a href="#cb7-17" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(df[<span class="st">"VolunteerLevel"</span>].<span class="bu">max</span>())</span>
+<span id="cb7-18"><a href="#cb7-18" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"------"</span>)</span>
+<span id="cb7-19"><a href="#cb7-19" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(df[<span class="st">"GPA"</span>].<span class="bu">min</span>())</span>
+<span id="cb7-20"><a href="#cb7-20" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(df[<span class="st">"WorkExp"</span>].<span class="bu">min</span>())</span>
+<span id="cb7-21"><a href="#cb7-21" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(df[<span class="st">"TestScore"</span>].<span class="bu">min</span>())</span>
+<span id="cb7-22"><a href="#cb7-22" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(df[<span class="st">"WritingScore"</span>].<span class="bu">min</span>())</span>
+<span id="cb7-23"><a href="#cb7-23" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(df[<span class="st">"VolunteerLevel"</span>].<span class="bu">min</span>())</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>3.4965
+2.1475
+870.0875
+81.6125
+2.4625
+------
+3.54
+1.55
+868.0
+83.5
+2.0
+------
+3.93
+9.2
+969
+100
+5
+------
+2.34
+0.0
+751
+1
+0</code></pre>
+</div>
+</div>
+<div class="cell" data-execution_count="212">
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Histograms of columns to double check for outliers</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>fig, axes <span class="op">=</span> plt.subplots(<span class="dv">3</span>, <span class="dv">2</span>, figsize <span class="op">=</span> (<span class="dv">14</span>,<span class="dv">11</span>))</span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>sns.histplot(data <span class="op">=</span> df, x <span class="op">=</span> <span class="st">"GPA"</span>, bins <span class="op">=</span> <span class="dv">10</span>, kde <span class="op">=</span> <span class="va">False</span>, color <span class="op">=</span> <span class="st">"#635380"</span>, edgecolor <span class="op">=</span> <span class="st">"black"</span>, ax <span class="op">=</span> axes[<span class="dv">0</span>, <span class="dv">0</span>])</span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">0</span>, <span class="dv">0</span>].set_title(<span class="st">"Distribution of GPA"</span>, fontsize <span class="op">=</span> <span class="dv">16</span>)</span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">0</span>, <span class="dv">0</span>].tick_params(axis <span class="op">=</span> <span class="st">"both"</span>, labelsize <span class="op">=</span> <span class="dv">14</span>)</span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">0</span>, <span class="dv">0</span>].set_xlabel(<span class="st">"GPA"</span>, fontsize <span class="op">=</span> <span class="dv">14</span>)</span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">0</span>, <span class="dv">0</span>].set_ylabel(<span class="st">"Frequency"</span>, fontsize <span class="op">=</span> <span class="dv">14</span>)</span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a>sns.histplot(data <span class="op">=</span> df, x <span class="op">=</span> <span class="st">"WorkExp"</span>, bins <span class="op">=</span> <span class="dv">10</span>, kde <span class="op">=</span> <span class="va">False</span>, color <span class="op">=</span> <span class="st">"#635380"</span>, edgecolor <span class="op">=</span> <span class="st">"black"</span>, ax <span class="op">=</span> axes[<span class="dv">0</span>, <span class="dv">1</span>])</span>
+<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">0</span>, <span class="dv">1</span>].set_title(<span class="st">"Distribution of Work Experience (Years)"</span>, fontsize <span class="op">=</span> <span class="dv">16</span>)</span>
+<span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">0</span>, <span class="dv">1</span>].tick_params(axis <span class="op">=</span> <span class="st">"both"</span>, labelsize <span class="op">=</span> <span class="dv">14</span>)</span>
+<span id="cb9-12"><a href="#cb9-12" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">0</span>, <span class="dv">1</span>].set_xlabel(<span class="st">"Work Experience"</span>, fontsize <span class="op">=</span> <span class="dv">14</span>)</span>
+<span id="cb9-13"><a href="#cb9-13" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">0</span>, <span class="dv">1</span>].set_ylabel(<span class="st">"Frequency"</span>, fontsize <span class="op">=</span> <span class="dv">14</span>)</span>
+<span id="cb9-14"><a href="#cb9-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-15"><a href="#cb9-15" aria-hidden="true" tabindex="-1"></a>sns.histplot(data <span class="op">=</span> df, x <span class="op">=</span> <span class="st">"TestScore"</span>, bins <span class="op">=</span> <span class="dv">10</span>, kde <span class="op">=</span> <span class="va">False</span>, color <span class="op">=</span> <span class="st">"#635380"</span>, edgecolor <span class="op">=</span> <span class="st">"black"</span>, ax <span class="op">=</span> axes[<span class="dv">1</span>, <span class="dv">0</span>])</span>
+<span id="cb9-16"><a href="#cb9-16" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">1</span>, <span class="dv">0</span>].set_title(<span class="st">"Distribution of Test Scores"</span>, fontsize <span class="op">=</span> <span class="dv">16</span>)</span>
+<span id="cb9-17"><a href="#cb9-17" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">1</span>, <span class="dv">0</span>].tick_params(axis <span class="op">=</span> <span class="st">"both"</span>, labelsize <span class="op">=</span> <span class="dv">14</span>)</span>
+<span id="cb9-18"><a href="#cb9-18" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">1</span>, <span class="dv">0</span>].set_xlabel(<span class="st">"Test Score"</span>, fontsize <span class="op">=</span> <span class="dv">14</span>)</span>
+<span id="cb9-19"><a href="#cb9-19" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">1</span>, <span class="dv">0</span>].set_ylabel(<span class="st">"Frequency"</span>, fontsize <span class="op">=</span> <span class="dv">14</span>)</span>
+<span id="cb9-20"><a href="#cb9-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-21"><a href="#cb9-21" aria-hidden="true" tabindex="-1"></a>sns.histplot(data <span class="op">=</span> df, x <span class="op">=</span> <span class="st">"WritingScore"</span>, bins <span class="op">=</span> <span class="dv">10</span>, kde <span class="op">=</span> <span class="va">False</span>, color <span class="op">=</span> <span class="st">"#635380"</span>, edgecolor <span class="op">=</span> <span class="st">"black"</span>, ax <span class="op">=</span> axes[<span class="dv">1</span>, <span class="dv">1</span>])</span>
+<span id="cb9-22"><a href="#cb9-22" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">1</span>, <span class="dv">1</span>].set_title(<span class="st">"Distribution of Writing Scores"</span>, fontsize <span class="op">=</span> <span class="dv">16</span>)</span>
+<span id="cb9-23"><a href="#cb9-23" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">1</span>, <span class="dv">1</span>].tick_params(axis <span class="op">=</span> <span class="st">"both"</span>, labelsize <span class="op">=</span> <span class="dv">14</span>)</span>
+<span id="cb9-24"><a href="#cb9-24" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">1</span>, <span class="dv">1</span>].set_xlabel(<span class="st">"Writing Score"</span>, fontsize <span class="op">=</span> <span class="dv">14</span>)</span>
+<span id="cb9-25"><a href="#cb9-25" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">1</span>, <span class="dv">1</span>].set_ylabel(<span class="st">"Frequency"</span>, fontsize <span class="op">=</span> <span class="dv">14</span>)</span>
+<span id="cb9-26"><a href="#cb9-26" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-27"><a href="#cb9-27" aria-hidden="true" tabindex="-1"></a>sns.histplot(data <span class="op">=</span> df, x <span class="op">=</span> <span class="st">"VolunteerLevel"</span>, bins <span class="op">=</span> <span class="dv">10</span>, kde <span class="op">=</span> <span class="va">False</span>, color <span class="op">=</span> <span class="st">"#635380"</span>, edgecolor <span class="op">=</span> <span class="st">"black"</span>, ax <span class="op">=</span> axes[<span class="dv">2</span>, <span class="dv">0</span>])</span>
+<span id="cb9-28"><a href="#cb9-28" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">2</span>, <span class="dv">0</span>].set_title(<span class="st">"Distribution of Volunteer Level"</span>, fontsize <span class="op">=</span> <span class="dv">16</span>)</span>
+<span id="cb9-29"><a href="#cb9-29" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">2</span>, <span class="dv">0</span>].tick_params(axis <span class="op">=</span> <span class="st">"both"</span>, labelsize <span class="op">=</span> <span class="dv">14</span>)</span>
+<span id="cb9-30"><a href="#cb9-30" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">2</span>, <span class="dv">0</span>].set_xlabel(<span class="st">"Volunteer Level"</span>, fontsize <span class="op">=</span> <span class="dv">14</span>)</span>
+<span id="cb9-31"><a href="#cb9-31" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">2</span>, <span class="dv">0</span>].set_ylabel(<span class="st">"Frequency"</span>, fontsize <span class="op">=</span> <span class="dv">14</span>)</span>
+<span id="cb9-32"><a href="#cb9-32" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-33"><a href="#cb9-33" aria-hidden="true" tabindex="-1"></a>fig.delaxes(axes[<span class="dv">2</span>, <span class="dv">1</span>])</span>
+<span id="cb9-34"><a href="#cb9-34" aria-hidden="true" tabindex="-1"></a>plt.tight_layout()</span>
+<span id="cb9-35"><a href="#cb9-35" aria-hidden="true" tabindex="-1"></a>plt.show()</span>
+<span id="cb9-36"><a href="#cb9-36" aria-hidden="true" tabindex="-1"></a>fig.savefig(<span class="st">"../website/images/variable_histograms.png"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<p><img src="mia_eda_files/figure-html/cell-7-output-1.png" class="img-fluid"></p>
+</div>
+</div>
+</section>
+<section id="investigating-gender-ratios" class="level3">
+<h3 class="anchored" data-anchor-id="investigating-gender-ratios">Investigating gender ratios</h3>
+<div class="cell" data-execution_count="213">
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Bar Chart of Gender Distribution</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>df[<span class="st">"Gender"</span>] <span class="op">=</span> df[<span class="st">"Gender"</span>].replace({<span class="dv">0</span>: <span class="st">"Female"</span>})</span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>df[<span class="st">"Gender"</span>] <span class="op">=</span> df[<span class="st">"Gender"</span>].replace({<span class="dv">1</span>: <span class="st">"Male"</span>})</span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>fig, ax <span class="op">=</span> plt.subplots(figsize <span class="op">=</span> (<span class="dv">8</span>, <span class="dv">6</span>))</span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>ax <span class="op">=</span> sns.countplot(x <span class="op">=</span> <span class="st">"Gender"</span>, data <span class="op">=</span> df, palette <span class="op">=</span> [<span class="st">"#5478AE"</span>, <span class="st">"#B16792"</span>])</span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> p <span class="kw">in</span> ax.patches:</span>
+<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a>    ax.annotate(<span class="ss">f'</span><span class="sc">{</span><span class="bu">int</span>(p.get_height())<span class="sc">}</span><span class="ss">'</span>, (p.get_x() <span class="op">+</span> p.get_width() <span class="op">/</span> <span class="fl">2.</span>, p.get_height()),</span>
+<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a>                ha <span class="op">=</span> <span class="st">"center"</span>, va <span class="op">=</span> <span class="st">"center"</span>, xytext <span class="op">=</span> (<span class="dv">0</span>, <span class="dv">10</span>), textcoords <span class="op">=</span> <span class="st">"offset points"</span>, fontsize <span class="op">=</span> <span class="dv">12</span>, color <span class="op">=</span> <span class="st">"black"</span>)</span>
+<span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-12"><a href="#cb10-12" aria-hidden="true" tabindex="-1"></a>ax.set_ylim(<span class="dv">0</span>, ax.get_ylim()[<span class="dv">1</span>] <span class="op">+</span> <span class="dv">5</span>)</span>
+<span id="cb10-13"><a href="#cb10-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-14"><a href="#cb10-14" aria-hidden="true" tabindex="-1"></a>plt.title(<span class="st">"Distribution of Gender in Summer Internship Applications"</span>)</span>
+<span id="cb10-15"><a href="#cb10-15" aria-hidden="true" tabindex="-1"></a>plt.xlabel(<span class="st">"Gender"</span>)</span>
+<span id="cb10-16"><a href="#cb10-16" aria-hidden="true" tabindex="-1"></a>plt.ylabel(<span class="st">"Count"</span>)</span>
+<span id="cb10-17"><a href="#cb10-17" aria-hidden="true" tabindex="-1"></a>plt.show()</span>
+<span id="cb10-18"><a href="#cb10-18" aria-hidden="true" tabindex="-1"></a>fig.savefig(<span class="st">"../website/images/gender_applications_barplot.png"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>/var/folders/_p/d81k_b_93575z7h2220jh4cr0000gn/T/ipykernel_16441/1875275667.py:6: FutureWarning:
+
+
+
+Passing `palette` without assigning `hue` is deprecated and will be removed in v0.14.0. Assign the `x` variable to `hue` and set `legend=False` for the same effect.
+
+</code></pre>
+</div>
+<div class="cell-output cell-output-display">
+<p><img src="mia_eda_files/figure-html/cell-8-output-2.png" class="img-fluid"></p>
+</div>
+</div>
+<div class="cell" data-execution_count="214">
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Pie Chart of Gender Distribution</span></span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>gender_counts <span class="op">=</span> df[<span class="st">'Gender'</span>].value_counts()</span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>gender_counts <span class="op">=</span> pd.DataFrame(gender_counts).reset_index()</span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>gender_counts.columns <span class="op">=</span> [<span class="st">"Gender"</span>, <span class="st">"Count"</span>]</span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>gender_counts[<span class="st">'Percentage'</span>] <span class="op">=</span> gender_counts[<span class="st">'Count'</span>] <span class="op">/</span> gender_counts[<span class="st">'Count'</span>].<span class="bu">sum</span>()</span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a>fig, ax <span class="op">=</span> plt.subplots(figsize <span class="op">=</span> (<span class="dv">6</span>, <span class="dv">6</span>))</span>
+<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a>ax.pie(gender_counts[<span class="st">"Percentage"</span>], labels <span class="op">=</span> gender_counts[<span class="st">"Gender"</span>], autopct <span class="op">=</span> <span class="st">'</span><span class="sc">%.1f%%</span><span class="st">'</span>, colors <span class="op">=</span> [<span class="st">"#5478AE"</span>, <span class="st">"#B16792"</span>])</span>
+<span id="cb12-9"><a href="#cb12-9" aria-hidden="true" tabindex="-1"></a>ax.set_title(<span class="st">"Distribution of Gender in Summer Internship Applications"</span>)</span>
+<span id="cb12-10"><a href="#cb12-10" aria-hidden="true" tabindex="-1"></a>plt.tight_layout()</span>
+<span id="cb12-11"><a href="#cb12-11" aria-hidden="true" tabindex="-1"></a>plt.show()</span>
+<span id="cb12-12"><a href="#cb12-12" aria-hidden="true" tabindex="-1"></a>fig.savefig(<span class="st">"../website/images/gender_applications_piechart.png"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<p><img src="mia_eda_files/figure-html/cell-9-output-1.png" class="img-fluid"></p>
+</div>
+</div>
+<div class="cell" data-execution_count="215">
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>gender_counts_by_state_reject</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="215">
+
+<div>
+
+<table class="dataframe table table-sm table-striped">
+  <thead>
+    <tr>
+      <th></th>
+      <th>Gender</th>
+      <th>State</th>
+      <th>count</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>Female</td>
+      <td>Florida</td>
+      <td>12</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>Female</td>
+      <td>Colorado</td>
+      <td>5</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>Female</td>
+      <td>Utah</td>
+      <td>2</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>Female</td>
+      <td>Virginia</td>
+      <td>2</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>Female</td>
+      <td>Alabama</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>Male</td>
+      <td>Florida</td>
+      <td>12</td>
+    </tr>
+    <tr>
+      <th>6</th>
+      <td>Male</td>
+      <td>Colorado</td>
+      <td>5</td>
+    </tr>
+    <tr>
+      <th>7</th>
+      <td>Male</td>
+      <td>California</td>
+      <td>3</td>
+    </tr>
+    <tr>
+      <th>8</th>
+      <td>Male</td>
+      <td>Utah</td>
+      <td>3</td>
+    </tr>
+    <tr>
+      <th>9</th>
+      <td>Male</td>
+      <td>Virginia</td>
+      <td>2</td>
+    </tr>
+    <tr>
+      <th>10</th>
+      <td>Male</td>
+      <td>Mississippi</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>11</th>
+      <td>Male</td>
+      <td>New York</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>12</th>
+      <td>Male</td>
+      <td>Oregon</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>13</th>
+      <td>Male</td>
+      <td>Vermont</td>
+      <td>1</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+</div>
+</div>
+<div class="cell" data-execution_count="216">
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="co">## PREPPING DATA FOR VISUALS</span></span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>gender_counts_by_state_all <span class="op">=</span> df.groupby(<span class="st">"Gender"</span>)[<span class="st">"State"</span>].value_counts().reset_index()</span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>females_all <span class="op">=</span> gender_counts_by_state_all[gender_counts_by_state_all[<span class="st">"Gender"</span>] <span class="op">==</span> <span class="st">"Female"</span>]</span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>males_all <span class="op">=</span> gender_counts_by_state_all[gender_counts_by_state_all[<span class="st">"Gender"</span>] <span class="op">==</span> <span class="st">"Male"</span>]</span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a>gender_counts_by_state_admitted <span class="op">=</span> df[df[<span class="st">"Decision"</span>] <span class="op">==</span> <span class="st">"Admit"</span>].groupby(<span class="st">"Gender"</span>)[<span class="st">"State"</span>].value_counts().reset_index()</span>
+<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a>females_admit <span class="op">=</span> gender_counts_by_state_admitted[gender_counts_by_state_admitted[<span class="st">"Gender"</span>] <span class="op">==</span> <span class="st">"Female"</span>]</span>
+<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a>males_admit <span class="op">=</span> gender_counts_by_state_admitted[gender_counts_by_state_admitted[<span class="st">"Gender"</span>] <span class="op">==</span> <span class="st">"Male"</span>]</span>
+<span id="cb14-9"><a href="#cb14-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-10"><a href="#cb14-10" aria-hidden="true" tabindex="-1"></a>gender_counts_by_state_reject <span class="op">=</span> df[df[<span class="st">"Decision"</span>] <span class="op">!=</span> <span class="st">"Admit"</span>].groupby(<span class="st">"Gender"</span>)[<span class="st">"State"</span>].value_counts().reset_index()</span>
+<span id="cb14-11"><a href="#cb14-11" aria-hidden="true" tabindex="-1"></a>females_reject <span class="op">=</span> gender_counts_by_state_reject[gender_counts_by_state_reject[<span class="st">"Gender"</span>] <span class="op">==</span> <span class="st">"Female"</span>]</span>
+<span id="cb14-12"><a href="#cb14-12" aria-hidden="true" tabindex="-1"></a>males_reject <span class="op">=</span> gender_counts_by_state_reject[gender_counts_by_state_reject[<span class="st">"Gender"</span>] <span class="op">==</span> <span class="st">"Male"</span>]</span>
+<span id="cb14-13"><a href="#cb14-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-14"><a href="#cb14-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-15"><a href="#cb14-15" aria-hidden="true" tabindex="-1"></a>all_states_male <span class="op">=</span> pd.DataFrame({<span class="st">"State"</span>: df.State.unique(), <span class="st">"count"</span>: <span class="dv">0</span>, <span class="st">"Gender"</span>: <span class="st">"Male"</span>})</span>
+<span id="cb14-16"><a href="#cb14-16" aria-hidden="true" tabindex="-1"></a>all_states_female <span class="op">=</span> pd.DataFrame({<span class="st">"State"</span>: df.State.unique(), <span class="st">"count"</span>: <span class="dv">0</span>, <span class="st">"Gender"</span>: <span class="st">"Female"</span>})</span>
+<span id="cb14-17"><a href="#cb14-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-18"><a href="#cb14-18" aria-hidden="true" tabindex="-1"></a>males_all <span class="op">=</span> pd.merge(all_states_male, males_all, on <span class="op">=</span> <span class="st">"State"</span>, how <span class="op">=</span> <span class="st">"left"</span>).fillna(<span class="dv">0</span>)</span>
+<span id="cb14-19"><a href="#cb14-19" aria-hidden="true" tabindex="-1"></a>males_all <span class="op">=</span> males_all[[<span class="st">"State"</span>, <span class="st">"count_y"</span>, <span class="st">"Gender_x"</span>]]</span>
+<span id="cb14-20"><a href="#cb14-20" aria-hidden="true" tabindex="-1"></a>males_all.columns <span class="op">=</span> [<span class="st">"State"</span>, <span class="st">"count"</span>, <span class="st">"Gender"</span>]</span>
+<span id="cb14-21"><a href="#cb14-21" aria-hidden="true" tabindex="-1"></a>males_all[<span class="st">"count"</span>] <span class="op">=</span> males_all[<span class="st">"count"</span>].astype(<span class="bu">int</span>)</span>
+<span id="cb14-22"><a href="#cb14-22" aria-hidden="true" tabindex="-1"></a>females_all <span class="op">=</span> pd.merge(all_states_female, females_all, on <span class="op">=</span> <span class="st">"State"</span>, how <span class="op">=</span> <span class="st">"left"</span>).fillna(<span class="dv">0</span>)</span>
+<span id="cb14-23"><a href="#cb14-23" aria-hidden="true" tabindex="-1"></a>females_all <span class="op">=</span> females_all[[<span class="st">"State"</span>, <span class="st">"count_y"</span>, <span class="st">"Gender_x"</span>]]</span>
+<span id="cb14-24"><a href="#cb14-24" aria-hidden="true" tabindex="-1"></a>females_all.columns <span class="op">=</span> [<span class="st">"State"</span>, <span class="st">"count"</span>, <span class="st">"Gender"</span>]</span>
+<span id="cb14-25"><a href="#cb14-25" aria-hidden="true" tabindex="-1"></a>females_all[<span class="st">"count"</span>] <span class="op">=</span> females_all[<span class="st">"count"</span>].astype(<span class="bu">int</span>)</span>
+<span id="cb14-26"><a href="#cb14-26" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-27"><a href="#cb14-27" aria-hidden="true" tabindex="-1"></a>males_admit <span class="op">=</span> pd.merge(all_states_male, males_admit, on <span class="op">=</span> <span class="st">"State"</span>, how <span class="op">=</span> <span class="st">"left"</span>).fillna(<span class="dv">0</span>)</span>
+<span id="cb14-28"><a href="#cb14-28" aria-hidden="true" tabindex="-1"></a>males_admit <span class="op">=</span> males_admit[[<span class="st">"State"</span>, <span class="st">"count_y"</span>, <span class="st">"Gender_x"</span>]]</span>
+<span id="cb14-29"><a href="#cb14-29" aria-hidden="true" tabindex="-1"></a>males_admit.columns <span class="op">=</span> [<span class="st">"State"</span>, <span class="st">"count"</span>, <span class="st">"Gender"</span>]</span>
+<span id="cb14-30"><a href="#cb14-30" aria-hidden="true" tabindex="-1"></a>males_admit[<span class="st">"count"</span>] <span class="op">=</span> males_admit[<span class="st">"count"</span>].astype(<span class="bu">int</span>)</span>
+<span id="cb14-31"><a href="#cb14-31" aria-hidden="true" tabindex="-1"></a>males_reject <span class="op">=</span> pd.merge(all_states_male, males_reject, on <span class="op">=</span> <span class="st">"State"</span>, how <span class="op">=</span> <span class="st">"left"</span>).fillna(<span class="dv">0</span>)</span>
+<span id="cb14-32"><a href="#cb14-32" aria-hidden="true" tabindex="-1"></a>males_reject <span class="op">=</span> males_reject[[<span class="st">"State"</span>, <span class="st">"count_y"</span>, <span class="st">"Gender_x"</span>]]</span>
+<span id="cb14-33"><a href="#cb14-33" aria-hidden="true" tabindex="-1"></a>males_reject.columns <span class="op">=</span> [<span class="st">"State"</span>, <span class="st">"count"</span>, <span class="st">"Gender"</span>]</span>
+<span id="cb14-34"><a href="#cb14-34" aria-hidden="true" tabindex="-1"></a>males_reject[<span class="st">"count"</span>] <span class="op">=</span> males_reject[<span class="st">"count"</span>].astype(<span class="bu">int</span>)</span>
+<span id="cb14-35"><a href="#cb14-35" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-36"><a href="#cb14-36" aria-hidden="true" tabindex="-1"></a>females_admit <span class="op">=</span> pd.merge(all_states_female, females_admit, on <span class="op">=</span> <span class="st">"State"</span>, how <span class="op">=</span> <span class="st">"left"</span>).fillna(<span class="dv">0</span>)</span>
+<span id="cb14-37"><a href="#cb14-37" aria-hidden="true" tabindex="-1"></a>females_admit <span class="op">=</span> females_admit[[<span class="st">"State"</span>, <span class="st">"count_y"</span>, <span class="st">"Gender_x"</span>]]</span>
+<span id="cb14-38"><a href="#cb14-38" aria-hidden="true" tabindex="-1"></a>females_admit.columns <span class="op">=</span> [<span class="st">"State"</span>, <span class="st">"count"</span>, <span class="st">"Gender"</span>]</span>
+<span id="cb14-39"><a href="#cb14-39" aria-hidden="true" tabindex="-1"></a>females_admit[<span class="st">"count"</span>] <span class="op">=</span> females_admit[<span class="st">"count"</span>].astype(<span class="bu">int</span>)</span>
+<span id="cb14-40"><a href="#cb14-40" aria-hidden="true" tabindex="-1"></a>females_reject <span class="op">=</span> pd.merge(all_states_female, females_reject, on <span class="op">=</span> <span class="st">"State"</span>, how <span class="op">=</span> <span class="st">"left"</span>).fillna(<span class="dv">0</span>)</span>
+<span id="cb14-41"><a href="#cb14-41" aria-hidden="true" tabindex="-1"></a>females_reject <span class="op">=</span> females_reject[[<span class="st">"State"</span>, <span class="st">"count_y"</span>, <span class="st">"Gender_x"</span>]]</span>
+<span id="cb14-42"><a href="#cb14-42" aria-hidden="true" tabindex="-1"></a>females_reject.columns <span class="op">=</span> [<span class="st">"State"</span>, <span class="st">"count"</span>, <span class="st">"Gender"</span>]</span>
+<span id="cb14-43"><a href="#cb14-43" aria-hidden="true" tabindex="-1"></a>females_reject[<span class="st">"count"</span>] <span class="op">=</span> females_reject[<span class="st">"count"</span>].astype(<span class="bu">int</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell" data-execution_count="217">
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Source: https://www.geeksforgeeks.org/how-to-create-a-population-pyramid-using-plotly-in-python/</span></span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a><span class="co">## DEFINING FUNCTIONS FOR VISUALS</span></span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> create_bar_trace(y, x, name, orientation, marker_color):</span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a>    trace <span class="op">=</span> go.Bar(y <span class="op">=</span> y, x <span class="op">=</span> x, name <span class="op">=</span> name, orientation <span class="op">=</span> orientation, marker_color <span class="op">=</span> marker_color)</span>
+<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> trace</span>
+<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-8"><a href="#cb15-8" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> add_data_labels_female(fig, y, x, sep):</span>
+<span id="cb15-9"><a href="#cb15-9" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> i, value <span class="kw">in</span> <span class="bu">enumerate</span>(x):</span>
+<span id="cb15-10"><a href="#cb15-10" aria-hidden="true" tabindex="-1"></a>        fig.add_annotation(<span class="bu">dict</span>(x <span class="op">=</span> value<span class="op">+</span>sep, y <span class="op">=</span> y[i], text <span class="op">=</span> <span class="bu">str</span>(value), showarrow <span class="op">=</span> <span class="va">False</span>, font <span class="op">=</span> <span class="bu">dict</span>(size <span class="op">=</span> <span class="dv">10</span>)))</span>
+<span id="cb15-11"><a href="#cb15-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-12"><a href="#cb15-12" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> add_data_labels_male(fig, y, x, sep):</span>
+<span id="cb15-13"><a href="#cb15-13" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> i, value <span class="kw">in</span> <span class="bu">enumerate</span>(x):</span>
+<span id="cb15-14"><a href="#cb15-14" aria-hidden="true" tabindex="-1"></a>        fig.add_annotation(<span class="bu">dict</span>(x <span class="op">=</span> value<span class="op">-</span>sep, y <span class="op">=</span> y[i], text <span class="op">=</span> <span class="bu">str</span>(value<span class="op">*-</span><span class="dv">1</span>), showarrow <span class="op">=</span> <span class="va">False</span>, font <span class="op">=</span> <span class="bu">dict</span>(size <span class="op">=</span> <span class="dv">10</span>)))</span>
+<span id="cb15-15"><a href="#cb15-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-16"><a href="#cb15-16" aria-hidden="true" tabindex="-1"></a><span class="co"># Sort alphabetically by state  </span></span>
+<span id="cb15-17"><a href="#cb15-17" aria-hidden="true" tabindex="-1"></a>males_all_sorted <span class="op">=</span> <span class="bu">sorted</span>(<span class="bu">zip</span>(males_all[<span class="st">"State"</span>], <span class="op">-</span>males_all[<span class="st">"count"</span>]), key<span class="op">=</span><span class="kw">lambda</span> x: x[<span class="dv">0</span>], reverse <span class="op">=</span> <span class="va">True</span>)</span>
+<span id="cb15-18"><a href="#cb15-18" aria-hidden="true" tabindex="-1"></a>females_all_sorted <span class="op">=</span> <span class="bu">sorted</span>(<span class="bu">zip</span>(females_all[<span class="st">"State"</span>], females_all[<span class="st">"count"</span>]), key<span class="op">=</span><span class="kw">lambda</span> x: x[<span class="dv">0</span>], reverse <span class="op">=</span> <span class="va">True</span>)</span>
+<span id="cb15-19"><a href="#cb15-19" aria-hidden="true" tabindex="-1"></a>males_all_states_sorted, males_all_counts_sorted <span class="op">=</span> <span class="bu">zip</span>(<span class="op">*</span>males_all_sorted)</span>
+<span id="cb15-20"><a href="#cb15-20" aria-hidden="true" tabindex="-1"></a>females_all_states_sorted, females_all_counts_sorted <span class="op">=</span> <span class="bu">zip</span>(<span class="op">*</span>females_all_sorted)</span>
+<span id="cb15-21"><a href="#cb15-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-22"><a href="#cb15-22" aria-hidden="true" tabindex="-1"></a>males_admit_sorted <span class="op">=</span> <span class="bu">sorted</span>(<span class="bu">zip</span>(males_admit[<span class="st">"State"</span>], <span class="op">-</span>males_admit[<span class="st">"count"</span>]), key<span class="op">=</span><span class="kw">lambda</span> x: x[<span class="dv">0</span>], reverse <span class="op">=</span> <span class="va">True</span>)</span>
+<span id="cb15-23"><a href="#cb15-23" aria-hidden="true" tabindex="-1"></a>females_admit_sorted <span class="op">=</span> <span class="bu">sorted</span>(<span class="bu">zip</span>(females_admit[<span class="st">"State"</span>], females_admit[<span class="st">"count"</span>]), key<span class="op">=</span><span class="kw">lambda</span> x: x[<span class="dv">0</span>], reverse <span class="op">=</span> <span class="va">True</span>)</span>
+<span id="cb15-24"><a href="#cb15-24" aria-hidden="true" tabindex="-1"></a>males_admit_states_sorted, males_admit_counts_sorted <span class="op">=</span> <span class="bu">zip</span>(<span class="op">*</span>males_admit_sorted)</span>
+<span id="cb15-25"><a href="#cb15-25" aria-hidden="true" tabindex="-1"></a>females_admit_states_sorted, females_admit_counts_sorted <span class="op">=</span> <span class="bu">zip</span>(<span class="op">*</span>females_admit_sorted)</span>
+<span id="cb15-26"><a href="#cb15-26" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-27"><a href="#cb15-27" aria-hidden="true" tabindex="-1"></a>males_reject_sorted <span class="op">=</span> <span class="bu">sorted</span>(<span class="bu">zip</span>(males_reject[<span class="st">"State"</span>], <span class="op">-</span>males_reject[<span class="st">"count"</span>]), key<span class="op">=</span><span class="kw">lambda</span> x: x[<span class="dv">0</span>], reverse <span class="op">=</span> <span class="va">True</span>)</span>
+<span id="cb15-28"><a href="#cb15-28" aria-hidden="true" tabindex="-1"></a>females_reject_sorted <span class="op">=</span> <span class="bu">sorted</span>(<span class="bu">zip</span>(females_reject[<span class="st">"State"</span>], females_reject[<span class="st">"count"</span>]), key<span class="op">=</span><span class="kw">lambda</span> x: x[<span class="dv">0</span>], reverse <span class="op">=</span> <span class="va">True</span>)</span>
+<span id="cb15-29"><a href="#cb15-29" aria-hidden="true" tabindex="-1"></a>males_reject_states_sorted, males_reject_counts_sorted <span class="op">=</span> <span class="bu">zip</span>(<span class="op">*</span>males_reject_sorted)</span>
+<span id="cb15-30"><a href="#cb15-30" aria-hidden="true" tabindex="-1"></a>females_reject_states_sorted, females_reject_counts_sorted <span class="op">=</span> <span class="bu">zip</span>(<span class="op">*</span>females_reject_sorted)</span>
+<span id="cb15-31"><a href="#cb15-31" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-32"><a href="#cb15-32" aria-hidden="true" tabindex="-1"></a><span class="co">## ALL APPLICATIONS</span></span>
+<span id="cb15-33"><a href="#cb15-33" aria-hidden="true" tabindex="-1"></a>trace1<span class="op">=</span> create_bar_trace(<span class="bu">list</span>(males_all_states_sorted), <span class="bu">list</span>(males_all_counts_sorted), <span class="st">"Male"</span>, <span class="st">"h"</span>, <span class="st">"#5478AE"</span>)</span>
+<span id="cb15-34"><a href="#cb15-34" aria-hidden="true" tabindex="-1"></a>trace2 <span class="op">=</span> create_bar_trace(<span class="bu">list</span>(females_all_states_sorted), <span class="bu">list</span>(females_all_counts_sorted), <span class="st">"Female"</span>, <span class="st">"h"</span>, <span class="st">"#B16792"</span>)</span>
+<span id="cb15-35"><a href="#cb15-35" aria-hidden="true" tabindex="-1"></a>fig1 <span class="op">=</span> go.Figure([trace1, trace2])</span>
+<span id="cb15-36"><a href="#cb15-36" aria-hidden="true" tabindex="-1"></a>fig1.update_layout(</span>
+<span id="cb15-37"><a href="#cb15-37" aria-hidden="true" tabindex="-1"></a>    title <span class="op">=</span> <span class="st">"Gender Breakdown by State: ALL Summer Internship Applications"</span>,</span>
+<span id="cb15-38"><a href="#cb15-38" aria-hidden="true" tabindex="-1"></a>    title_font_size <span class="op">=</span> <span class="dv">22</span>,</span>
+<span id="cb15-39"><a href="#cb15-39" aria-hidden="true" tabindex="-1"></a>    barmode <span class="op">=</span> <span class="st">"relative"</span>,</span>
+<span id="cb15-40"><a href="#cb15-40" aria-hidden="true" tabindex="-1"></a>    bargap <span class="op">=</span> <span class="fl">0.0</span>,</span>
+<span id="cb15-41"><a href="#cb15-41" aria-hidden="true" tabindex="-1"></a>    bargroupgap <span class="op">=</span> <span class="dv">0</span>,</span>
+<span id="cb15-42"><a href="#cb15-42" aria-hidden="true" tabindex="-1"></a>    xaxis <span class="op">=</span> <span class="bu">dict</span>(</span>
+<span id="cb15-43"><a href="#cb15-43" aria-hidden="true" tabindex="-1"></a>        tickvals <span class="op">=</span> [<span class="op">-</span><span class="dv">55</span>, <span class="op">-</span><span class="dv">50</span>, <span class="op">-</span><span class="dv">45</span>, <span class="op">-</span><span class="dv">40</span>, <span class="op">-</span><span class="dv">35</span>, <span class="op">-</span><span class="dv">30</span>, <span class="op">-</span><span class="dv">25</span>, <span class="op">-</span><span class="dv">20</span>, <span class="op">-</span><span class="dv">15</span>, <span class="op">-</span><span class="dv">10</span>, <span class="op">-</span><span class="dv">5</span>, <span class="dv">0</span>, <span class="dv">5</span>, <span class="dv">10</span>, <span class="dv">15</span>, <span class="dv">20</span>, <span class="dv">25</span>, <span class="dv">30</span>, <span class="dv">35</span>, <span class="dv">40</span>, <span class="dv">45</span>, <span class="dv">50</span>, <span class="dv">55</span>],</span>
+<span id="cb15-44"><a href="#cb15-44" aria-hidden="true" tabindex="-1"></a>        ticktext <span class="op">=</span> [<span class="st">"55"</span>, <span class="st">"50"</span>, <span class="st">"45"</span>, <span class="st">"40"</span>, <span class="st">"35"</span>, <span class="st">"30"</span>, <span class="st">"25"</span>, <span class="st">"20"</span>, <span class="st">"15"</span>, <span class="st">"10"</span>, <span class="st">"5"</span>, <span class="st">"0"</span>, <span class="st">"5"</span>, <span class="st">"10"</span>, <span class="st">"15"</span>, <span class="st">"20"</span>, <span class="st">"25"</span>, <span class="st">"30"</span>, <span class="st">"35"</span>, <span class="st">"40"</span>, <span class="st">"45"</span>, <span class="st">"50"</span>, <span class="st">"55"</span>],</span>
+<span id="cb15-45"><a href="#cb15-45" aria-hidden="true" tabindex="-1"></a>        title <span class="op">=</span> <span class="st">"Number of Applications"</span>,</span>
+<span id="cb15-46"><a href="#cb15-46" aria-hidden="true" tabindex="-1"></a>        title_font_size <span class="op">=</span> <span class="dv">14</span>))</span>
+<span id="cb15-47"><a href="#cb15-47" aria-hidden="true" tabindex="-1"></a>add_data_labels_male(fig1, <span class="bu">list</span>(males_all[<span class="st">"State"</span>]), <span class="op">-</span>males_all[<span class="st">"count"</span>], <span class="fl">0.3</span>)</span>
+<span id="cb15-48"><a href="#cb15-48" aria-hidden="true" tabindex="-1"></a>add_data_labels_female(fig1, <span class="bu">list</span>(females_all[<span class="st">"State"</span>]), females_all[<span class="st">"count"</span>], <span class="fl">0.3</span>)</span>
+<span id="cb15-49"><a href="#cb15-49" aria-hidden="true" tabindex="-1"></a>fig1.show()</span>
+<span id="cb15-50"><a href="#cb15-50" aria-hidden="true" tabindex="-1"></a>fig1.write_image(<span class="st">"../website/images/gender_dist_plot_by_state_all.png"</span>, engine <span class="op">=</span> <span class="st">"kaleido"</span>)</span>
+<span id="cb15-51"><a href="#cb15-51" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-52"><a href="#cb15-52" aria-hidden="true" tabindex="-1"></a><span class="co">## ADMITTED APPLICATIONS</span></span>
+<span id="cb15-53"><a href="#cb15-53" aria-hidden="true" tabindex="-1"></a>trace3 <span class="op">=</span> create_bar_trace(<span class="bu">list</span>(males_admit_states_sorted), <span class="bu">list</span>(males_admit_counts_sorted), <span class="st">"Male"</span>, <span class="st">"h"</span>, <span class="st">"#5478AE"</span>)</span>
+<span id="cb15-54"><a href="#cb15-54" aria-hidden="true" tabindex="-1"></a>trace4 <span class="op">=</span> create_bar_trace(<span class="bu">list</span>(females_admit_states_sorted), <span class="bu">list</span>(females_admit_counts_sorted), <span class="st">"Female"</span>, <span class="st">"h"</span>, <span class="st">"#B16792"</span>)</span>
+<span id="cb15-55"><a href="#cb15-55" aria-hidden="true" tabindex="-1"></a>fig2 <span class="op">=</span> go.Figure([trace3, trace4])</span>
+<span id="cb15-56"><a href="#cb15-56" aria-hidden="true" tabindex="-1"></a>fig2.update_layout(</span>
+<span id="cb15-57"><a href="#cb15-57" aria-hidden="true" tabindex="-1"></a>    title <span class="op">=</span> <span class="st">"Gender Breakdown by State: ADMITTED Summer Internship Applications"</span>,</span>
+<span id="cb15-58"><a href="#cb15-58" aria-hidden="true" tabindex="-1"></a>    title_font_size <span class="op">=</span> <span class="dv">22</span>,</span>
+<span id="cb15-59"><a href="#cb15-59" aria-hidden="true" tabindex="-1"></a>    barmode <span class="op">=</span> <span class="st">"relative"</span>,</span>
+<span id="cb15-60"><a href="#cb15-60" aria-hidden="true" tabindex="-1"></a>    bargap <span class="op">=</span> <span class="fl">0.0</span>,</span>
+<span id="cb15-61"><a href="#cb15-61" aria-hidden="true" tabindex="-1"></a>    bargroupgap <span class="op">=</span> <span class="dv">0</span>,</span>
+<span id="cb15-62"><a href="#cb15-62" aria-hidden="true" tabindex="-1"></a>    xaxis <span class="op">=</span> <span class="bu">dict</span>(</span>
+<span id="cb15-63"><a href="#cb15-63" aria-hidden="true" tabindex="-1"></a>        tickvals <span class="op">=</span> [<span class="op">-</span><span class="dv">20</span>, <span class="op">-</span><span class="dv">15</span>, <span class="op">-</span><span class="dv">10</span>, <span class="op">-</span><span class="dv">5</span>, <span class="dv">0</span>, <span class="dv">5</span>, <span class="dv">10</span>, <span class="dv">15</span>, <span class="dv">20</span>],</span>
+<span id="cb15-64"><a href="#cb15-64" aria-hidden="true" tabindex="-1"></a>        ticktext <span class="op">=</span> [<span class="st">"20"</span>, <span class="st">"15"</span>, <span class="st">"10"</span>, <span class="st">"5"</span>, <span class="st">"0"</span>, <span class="st">"5"</span>, <span class="st">"10"</span>, <span class="st">"15"</span>, <span class="st">"20"</span>],</span>
+<span id="cb15-65"><a href="#cb15-65" aria-hidden="true" tabindex="-1"></a>        title <span class="op">=</span> <span class="st">"Number of Admitted Interns"</span>,</span>
+<span id="cb15-66"><a href="#cb15-66" aria-hidden="true" tabindex="-1"></a>        title_font_size <span class="op">=</span> <span class="dv">14</span>, </span>
+<span id="cb15-67"><a href="#cb15-67" aria-hidden="true" tabindex="-1"></a>        <span class="bu">range</span> <span class="op">=</span> [<span class="op">-</span><span class="dv">15</span>, <span class="dv">15</span>]))</span>
+<span id="cb15-68"><a href="#cb15-68" aria-hidden="true" tabindex="-1"></a>add_data_labels_male(fig2, <span class="bu">list</span>(males_admit[<span class="st">"State"</span>]), <span class="op">-</span>males_admit[<span class="st">"count"</span>], <span class="fl">0.2</span>)</span>
+<span id="cb15-69"><a href="#cb15-69" aria-hidden="true" tabindex="-1"></a>add_data_labels_female(fig2, <span class="bu">list</span>(females_admit[<span class="st">"State"</span>]), females_admit[<span class="st">"count"</span>], <span class="fl">0.2</span>)</span>
+<span id="cb15-70"><a href="#cb15-70" aria-hidden="true" tabindex="-1"></a>fig2.show()</span>
+<span id="cb15-71"><a href="#cb15-71" aria-hidden="true" tabindex="-1"></a>fig2.write_image(<span class="st">"../website/images/gender_dist_plot_by_state_admitted.png"</span>, engine <span class="op">=</span> <span class="st">"kaleido"</span>)</span>
+<span id="cb15-72"><a href="#cb15-72" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-73"><a href="#cb15-73" aria-hidden="true" tabindex="-1"></a><span class="co">## REJECTED/WAITLISTED APPLICATIONS</span></span>
+<span id="cb15-74"><a href="#cb15-74" aria-hidden="true" tabindex="-1"></a>trace5 <span class="op">=</span> create_bar_trace(<span class="bu">list</span>(males_reject_states_sorted), <span class="bu">list</span>(males_reject_counts_sorted), <span class="st">"Male"</span>, <span class="st">"h"</span>, <span class="st">"#5478AE"</span>)</span>
+<span id="cb15-75"><a href="#cb15-75" aria-hidden="true" tabindex="-1"></a>trace6 <span class="op">=</span> create_bar_trace(<span class="bu">list</span>(females_reject_states_sorted), <span class="bu">list</span>(females_reject_counts_sorted), <span class="st">"Female"</span>, <span class="st">"h"</span>, <span class="st">"#B16792"</span>)</span>
+<span id="cb15-76"><a href="#cb15-76" aria-hidden="true" tabindex="-1"></a>fig3 <span class="op">=</span> go.Figure([trace5, trace6])</span>
+<span id="cb15-77"><a href="#cb15-77" aria-hidden="true" tabindex="-1"></a>fig3.update_layout(</span>
+<span id="cb15-78"><a href="#cb15-78" aria-hidden="true" tabindex="-1"></a>    title <span class="op">=</span> <span class="st">"Gender Breakdown by State: REJECTED/WAITLISTED Summer Internship Applications"</span>,</span>
+<span id="cb15-79"><a href="#cb15-79" aria-hidden="true" tabindex="-1"></a>    title_font_size <span class="op">=</span> <span class="dv">22</span>,</span>
+<span id="cb15-80"><a href="#cb15-80" aria-hidden="true" tabindex="-1"></a>    barmode <span class="op">=</span> <span class="st">"relative"</span>,</span>
+<span id="cb15-81"><a href="#cb15-81" aria-hidden="true" tabindex="-1"></a>    bargap <span class="op">=</span> <span class="fl">0.0</span>,</span>
+<span id="cb15-82"><a href="#cb15-82" aria-hidden="true" tabindex="-1"></a>    bargroupgap <span class="op">=</span> <span class="dv">0</span>,</span>
+<span id="cb15-83"><a href="#cb15-83" aria-hidden="true" tabindex="-1"></a>    xaxis <span class="op">=</span> <span class="bu">dict</span>(</span>
+<span id="cb15-84"><a href="#cb15-84" aria-hidden="true" tabindex="-1"></a>        tickvals <span class="op">=</span> [<span class="op">-</span><span class="dv">20</span>, <span class="op">-</span><span class="dv">15</span>, <span class="op">-</span><span class="dv">10</span>, <span class="op">-</span><span class="dv">5</span>, <span class="dv">0</span>, <span class="dv">5</span>, <span class="dv">10</span>, <span class="dv">15</span>, <span class="dv">20</span>],</span>
+<span id="cb15-85"><a href="#cb15-85" aria-hidden="true" tabindex="-1"></a>        ticktext <span class="op">=</span> [<span class="st">"20"</span>, <span class="st">"15"</span>, <span class="st">"10"</span>, <span class="st">"5"</span>, <span class="st">"0"</span>, <span class="st">"5"</span>, <span class="st">"10"</span>, <span class="st">"15"</span>, <span class="st">"20"</span>],</span>
+<span id="cb15-86"><a href="#cb15-86" aria-hidden="true" tabindex="-1"></a>        title <span class="op">=</span> <span class="st">"Number of Rejected/Waitlisted Interns"</span>,</span>
+<span id="cb15-87"><a href="#cb15-87" aria-hidden="true" tabindex="-1"></a>        title_font_size <span class="op">=</span> <span class="dv">14</span>, </span>
+<span id="cb15-88"><a href="#cb15-88" aria-hidden="true" tabindex="-1"></a>        <span class="bu">range</span> <span class="op">=</span> [<span class="op">-</span><span class="dv">15</span>, <span class="dv">15</span>]))</span>
+<span id="cb15-89"><a href="#cb15-89" aria-hidden="true" tabindex="-1"></a>add_data_labels_male(fig3, <span class="bu">list</span>(males_reject[<span class="st">"State"</span>]), <span class="op">-</span>males_reject[<span class="st">"count"</span>], <span class="fl">0.3</span>)</span>
+<span id="cb15-90"><a href="#cb15-90" aria-hidden="true" tabindex="-1"></a>add_data_labels_female(fig3, <span class="bu">list</span>(females_reject[<span class="st">"State"</span>]), females_reject[<span class="st">"count"</span>], <span class="fl">0.3</span>)</span>
+<span id="cb15-91"><a href="#cb15-91" aria-hidden="true" tabindex="-1"></a>fig3.show()</span>
+<span id="cb15-92"><a href="#cb15-92" aria-hidden="true" tabindex="-1"></a>fig3.write_image(<span class="st">"../website/images/gender_dist_plot_by_state_rejected.png"</span>, engine <span class="op">=</span> <span class="st">"kaleido"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<pre><code>Unable to display output for mime type(s): application/vnd.plotly.v1+json</code></pre>
+</div>
+<div class="cell-output cell-output-display">
+<pre><code>Unable to display output for mime type(s): application/vnd.plotly.v1+json</code></pre>
+</div>
+<div class="cell-output cell-output-display">
+<pre><code>Unable to display output for mime type(s): application/vnd.plotly.v1+json</code></pre>
+</div>
+</div>
+<div class="cell" data-execution_count="218">
+<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="co">## EXTRA DATA PREP</span></span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>all_states_male <span class="op">=</span> pd.DataFrame({<span class="st">"State"</span>: df.State.unique(), <span class="st">"count"</span>: <span class="dv">0</span>, <span class="st">"Gender"</span>: <span class="st">"Male"</span>})</span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>all_states_female <span class="op">=</span> pd.DataFrame({<span class="st">"State"</span>: df.State.unique(), <span class="st">"count"</span>: <span class="dv">0</span>, <span class="st">"Gender"</span>: <span class="st">"Female"</span>})</span>
+<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a>males_admit <span class="op">=</span> pd.merge(all_states_male, males_admit, on <span class="op">=</span> <span class="st">"State"</span>, how <span class="op">=</span> <span class="st">"left"</span>).fillna(<span class="dv">0</span>)</span>
+<span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a>males_admit <span class="op">=</span> males_admit[[<span class="st">"State"</span>, <span class="st">"count_y"</span>, <span class="st">"Gender_x"</span>]]</span>
+<span id="cb19-7"><a href="#cb19-7" aria-hidden="true" tabindex="-1"></a>males_admit.columns <span class="op">=</span> [<span class="st">"State"</span>, <span class="st">"count"</span>, <span class="st">"Gender"</span>]</span>
+<span id="cb19-8"><a href="#cb19-8" aria-hidden="true" tabindex="-1"></a>males_reject <span class="op">=</span> pd.merge(all_states_male, males_reject, on <span class="op">=</span> <span class="st">"State"</span>, how <span class="op">=</span> <span class="st">"left"</span>).fillna(<span class="dv">0</span>)</span>
+<span id="cb19-9"><a href="#cb19-9" aria-hidden="true" tabindex="-1"></a>males_reject <span class="op">=</span> males_reject[[<span class="st">"State"</span>, <span class="st">"count_y"</span>, <span class="st">"Gender_x"</span>]]</span>
+<span id="cb19-10"><a href="#cb19-10" aria-hidden="true" tabindex="-1"></a>males_reject.columns <span class="op">=</span> [<span class="st">"State"</span>, <span class="st">"count"</span>, <span class="st">"Gender"</span>]</span>
+<span id="cb19-11"><a href="#cb19-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-12"><a href="#cb19-12" aria-hidden="true" tabindex="-1"></a>females_admit <span class="op">=</span> pd.merge(all_states_female, females_admit, on <span class="op">=</span> <span class="st">"State"</span>, how <span class="op">=</span> <span class="st">"left"</span>).fillna(<span class="dv">0</span>)</span>
+<span id="cb19-13"><a href="#cb19-13" aria-hidden="true" tabindex="-1"></a>females_admit <span class="op">=</span> females_admit[[<span class="st">"State"</span>, <span class="st">"count_y"</span>, <span class="st">"Gender_x"</span>]]</span>
+<span id="cb19-14"><a href="#cb19-14" aria-hidden="true" tabindex="-1"></a>females_admit.columns <span class="op">=</span> [<span class="st">"State"</span>, <span class="st">"count"</span>, <span class="st">"Gender"</span>]</span>
+<span id="cb19-15"><a href="#cb19-15" aria-hidden="true" tabindex="-1"></a>females_reject <span class="op">=</span> pd.merge(all_states_female, females_reject, on <span class="op">=</span> <span class="st">"State"</span>, how <span class="op">=</span> <span class="st">"left"</span>).fillna(<span class="dv">0</span>)</span>
+<span id="cb19-16"><a href="#cb19-16" aria-hidden="true" tabindex="-1"></a>females_reject <span class="op">=</span> females_reject[[<span class="st">"State"</span>, <span class="st">"count_y"</span>, <span class="st">"Gender_x"</span>]]</span>
+<span id="cb19-17"><a href="#cb19-17" aria-hidden="true" tabindex="-1"></a>females_reject.columns <span class="op">=</span> [<span class="st">"State"</span>, <span class="st">"count"</span>, <span class="st">"Gender"</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell" data-execution_count="219">
+<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="co"># ADMITTED APPLICATIONS</span></span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>trace_admit_male <span class="op">=</span> create_bar_trace(<span class="bu">list</span>(males_admit[<span class="st">"State"</span>]), <span class="op">-</span>males_admit[<span class="st">"count"</span>], <span class="st">"Male (Admitted)"</span>, <span class="st">"h"</span>, <span class="st">"#9FBFF0"</span>)</span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>trace_admit_female <span class="op">=</span> create_bar_trace(<span class="bu">list</span>(females_admit[<span class="st">"State"</span>]), females_admit[<span class="st">"count"</span>], <span class="st">"Female (Admitted)"</span>, <span class="st">"h"</span>, <span class="st">"#EE95C9"</span>)</span>
+<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a><span class="co"># REJECTED/WAITLISTED APPLICATIONS</span></span>
+<span id="cb20-6"><a href="#cb20-6" aria-hidden="true" tabindex="-1"></a>trace_reject_male <span class="op">=</span> create_bar_trace(<span class="bu">list</span>(males_reject[<span class="st">"State"</span>]), <span class="op">-</span>males_reject[<span class="st">"count"</span>], <span class="st">"Male (Rejected/Waitlisted)"</span>, <span class="st">"h"</span>, <span class="st">"#5478AE"</span>)</span>
+<span id="cb20-7"><a href="#cb20-7" aria-hidden="true" tabindex="-1"></a>trace_reject_female <span class="op">=</span> create_bar_trace(<span class="bu">list</span>(females_reject[<span class="st">"State"</span>]), females_reject[<span class="st">"count"</span>], <span class="st">"Female (Rejected/Waitlisted)"</span>, <span class="st">"h"</span>, <span class="st">"#B16792"</span>)</span>
+<span id="cb20-8"><a href="#cb20-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-9"><a href="#cb20-9" aria-hidden="true" tabindex="-1"></a><span class="co"># CUMMULATIVE FOR REJECT BAR PART</span></span>
+<span id="cb20-10"><a href="#cb20-10" aria-hidden="true" tabindex="-1"></a>cumulative_reject_male <span class="op">=</span> males_admit[<span class="st">"count"</span>].values <span class="op">+</span> males_reject[<span class="st">"count"</span>].values</span>
+<span id="cb20-11"><a href="#cb20-11" aria-hidden="true" tabindex="-1"></a>cumulative_reject_female <span class="op">=</span> females_admit[<span class="st">"count"</span>].values <span class="op">+</span> females_reject[<span class="st">"count"</span>].values</span>
+<span id="cb20-12"><a href="#cb20-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-13"><a href="#cb20-13" aria-hidden="true" tabindex="-1"></a>fig <span class="op">=</span> go.Figure([trace_reject_male.update(x <span class="op">=</span> <span class="op">-</span>cumulative_reject_male), trace_admit_male, trace_reject_female.update(x <span class="op">=</span> cumulative_reject_female), trace_admit_female])</span>
+<span id="cb20-14"><a href="#cb20-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-15"><a href="#cb20-15" aria-hidden="true" tabindex="-1"></a>fig.update_layout(</span>
+<span id="cb20-16"><a href="#cb20-16" aria-hidden="true" tabindex="-1"></a>    title<span class="op">=</span><span class="st">"Gender Breakdown by State: Summer Internship Applications"</span>,</span>
+<span id="cb20-17"><a href="#cb20-17" aria-hidden="true" tabindex="-1"></a>    title_font_size<span class="op">=</span><span class="dv">22</span>,</span>
+<span id="cb20-18"><a href="#cb20-18" aria-hidden="true" tabindex="-1"></a>    barmode<span class="op">=</span><span class="st">"stack"</span>,  </span>
+<span id="cb20-19"><a href="#cb20-19" aria-hidden="true" tabindex="-1"></a>    bargap<span class="op">=</span><span class="fl">0.0</span>,</span>
+<span id="cb20-20"><a href="#cb20-20" aria-hidden="true" tabindex="-1"></a>    bargroupgap<span class="op">=</span><span class="dv">0</span>,</span>
+<span id="cb20-21"><a href="#cb20-21" aria-hidden="true" tabindex="-1"></a>    xaxis<span class="op">=</span><span class="bu">dict</span>(</span>
+<span id="cb20-22"><a href="#cb20-22" aria-hidden="true" tabindex="-1"></a>        tickvals<span class="op">=</span>[<span class="op">-</span><span class="dv">25</span>, <span class="op">-</span><span class="dv">20</span>, <span class="op">-</span><span class="dv">15</span>, <span class="op">-</span><span class="dv">10</span>, <span class="op">-</span><span class="dv">5</span>, <span class="dv">0</span>, <span class="dv">5</span>, <span class="dv">10</span>, <span class="dv">15</span>, <span class="dv">20</span>, <span class="dv">25</span>],</span>
+<span id="cb20-23"><a href="#cb20-23" aria-hidden="true" tabindex="-1"></a>        ticktext<span class="op">=</span>[], <span class="co">#"25", "20", "15", "10", "5", "0", "5", "10", "15", "20", "25"</span></span>
+<span id="cb20-24"><a href="#cb20-24" aria-hidden="true" tabindex="-1"></a>        title<span class="op">=</span><span class="st">"Number of Interns"</span>,</span>
+<span id="cb20-25"><a href="#cb20-25" aria-hidden="true" tabindex="-1"></a>        title_font_size<span class="op">=</span><span class="dv">14</span>))</span>
+<span id="cb20-26"><a href="#cb20-26" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-27"><a href="#cb20-27" aria-hidden="true" tabindex="-1"></a>fig.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<pre><code>Unable to display output for mime type(s): application/vnd.plotly.v1+json</code></pre>
+</div>
+</div>
+<div class="cell" data-execution_count="220">
+<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Calculate cumulative sums for stacking</span></span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>cumulative_admit_male <span class="op">=</span> [<span class="dv">0</span>] <span class="op">+</span> [<span class="bu">sum</span>(males_admit[<span class="st">"count"</span>][:i<span class="op">+</span><span class="dv">1</span>]) <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="bu">len</span>(males_admit))]</span>
+<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a>cumulative_reject_male <span class="op">=</span> [<span class="dv">0</span>] <span class="op">+</span> [<span class="op">-</span><span class="bu">sum</span>(males_reject[<span class="st">"count"</span>][:i<span class="op">+</span><span class="dv">1</span>]) <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="bu">len</span>(males_reject))]</span>
+<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-5"><a href="#cb22-5" aria-hidden="true" tabindex="-1"></a>cumulative_admit_female <span class="op">=</span> [<span class="dv">0</span>] <span class="op">+</span> [<span class="bu">sum</span>(females_admit[<span class="st">"count"</span>][:i<span class="op">+</span><span class="dv">1</span>]) <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="bu">len</span>(females_admit))]</span>
+<span id="cb22-6"><a href="#cb22-6" aria-hidden="true" tabindex="-1"></a>cumulative_reject_female <span class="op">=</span> [<span class="dv">0</span>] <span class="op">+</span> [<span class="op">-</span><span class="bu">sum</span>(females_reject[<span class="st">"count"</span>][:i<span class="op">+</span><span class="dv">1</span>]) <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="bu">len</span>(females_reject))]</span>
+<span id="cb22-7"><a href="#cb22-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-8"><a href="#cb22-8" aria-hidden="true" tabindex="-1"></a><span class="co"># Create bar traces</span></span>
+<span id="cb22-9"><a href="#cb22-9" aria-hidden="true" tabindex="-1"></a>trace_male_rejected <span class="op">=</span> go.Bar(x<span class="op">=</span>cumulative_reject_male[<span class="dv">1</span>:], y<span class="op">=</span>males_reject[<span class="st">"State"</span>], name<span class="op">=</span><span class="st">'Male - Rejected'</span>, orientation<span class="op">=</span><span class="st">'h'</span>, marker<span class="op">=</span><span class="bu">dict</span>(color<span class="op">=</span><span class="st">'#5478AE'</span>))</span>
+<span id="cb22-10"><a href="#cb22-10" aria-hidden="true" tabindex="-1"></a>trace_male_admitted <span class="op">=</span> go.Bar(x<span class="op">=</span>cumulative_admit_male[<span class="dv">1</span>:], y<span class="op">=</span>males_admit[<span class="st">"State"</span>], name<span class="op">=</span><span class="st">'Male - Admitted'</span>, orientation<span class="op">=</span><span class="st">'h'</span>, marker<span class="op">=</span><span class="bu">dict</span>(color<span class="op">=</span><span class="st">'#9FBFF0'</span>))</span>
+<span id="cb22-11"><a href="#cb22-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-12"><a href="#cb22-12" aria-hidden="true" tabindex="-1"></a>trace_female_admitted <span class="op">=</span> go.Bar(x<span class="op">=</span>cumulative_admit_female[<span class="dv">1</span>:], y<span class="op">=</span>females_reject[<span class="st">"State"</span>], name<span class="op">=</span><span class="st">'Female - Admitted'</span>, orientation<span class="op">=</span><span class="st">'h'</span>, marker<span class="op">=</span><span class="bu">dict</span>(color<span class="op">=</span><span class="st">'#EE95C9'</span>))</span>
+<span id="cb22-13"><a href="#cb22-13" aria-hidden="true" tabindex="-1"></a>trace_female_rejected <span class="op">=</span> go.Bar(x<span class="op">=</span>cumulative_reject_female[<span class="dv">1</span>:], y<span class="op">=</span>females_admit[<span class="st">"State"</span>], name<span class="op">=</span><span class="st">'Female - Rejected'</span>, orientation<span class="op">=</span><span class="st">'h'</span>, marker<span class="op">=</span><span class="bu">dict</span>(color<span class="op">=</span><span class="st">'#B16792'</span>))</span>
+<span id="cb22-14"><a href="#cb22-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-15"><a href="#cb22-15" aria-hidden="true" tabindex="-1"></a><span class="co"># Create the figure</span></span>
+<span id="cb22-16"><a href="#cb22-16" aria-hidden="true" tabindex="-1"></a>fig <span class="op">=</span> go.Figure(data<span class="op">=</span>[trace_male_rejected, trace_male_admitted, trace_female_admitted, trace_female_rejected])</span>
+<span id="cb22-17"><a href="#cb22-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-18"><a href="#cb22-18" aria-hidden="true" tabindex="-1"></a><span class="co"># Update layout</span></span>
+<span id="cb22-19"><a href="#cb22-19" aria-hidden="true" tabindex="-1"></a>fig.update_layout(</span>
+<span id="cb22-20"><a href="#cb22-20" aria-hidden="true" tabindex="-1"></a>    title<span class="op">=</span><span class="st">"Gender Breakdown by State: Summer Internship Applications"</span>,</span>
+<span id="cb22-21"><a href="#cb22-21" aria-hidden="true" tabindex="-1"></a>    title_font_size<span class="op">=</span><span class="dv">22</span>,</span>
+<span id="cb22-22"><a href="#cb22-22" aria-hidden="true" tabindex="-1"></a>    barmode<span class="op">=</span><span class="st">"stack"</span>,</span>
+<span id="cb22-23"><a href="#cb22-23" aria-hidden="true" tabindex="-1"></a>    bargap<span class="op">=</span><span class="fl">0.0</span>,</span>
+<span id="cb22-24"><a href="#cb22-24" aria-hidden="true" tabindex="-1"></a>    bargroupgap<span class="op">=</span><span class="dv">0</span>,</span>
+<span id="cb22-25"><a href="#cb22-25" aria-hidden="true" tabindex="-1"></a>    xaxis<span class="op">=</span><span class="bu">dict</span>(title<span class="op">=</span><span class="st">"Number of Interns"</span>),</span>
+<span id="cb22-26"><a href="#cb22-26" aria-hidden="true" tabindex="-1"></a>    yaxis<span class="op">=</span><span class="bu">dict</span>(title<span class="op">=</span><span class="st">"State"</span>)</span>
+<span id="cb22-27"><a href="#cb22-27" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb22-28"><a href="#cb22-28" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-29"><a href="#cb22-29" aria-hidden="true" tabindex="-1"></a><span class="co"># Show the figure</span></span>
+<span id="cb22-30"><a href="#cb22-30" aria-hidden="true" tabindex="-1"></a>fig.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<pre><code>Unable to display output for mime type(s): application/vnd.plotly.v1+json</code></pre>
+</div>
+</div>
+</section>
+<section id="archive" class="level3">
+<h3 class="anchored" data-anchor-id="archive">ARCHIVE</h3>
+<div class="cell" data-execution_count="221">
+<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Adding per state admission rates</span></span>
+<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> s <span class="kw">in</span> df[<span class="st">"State"</span>].unique():</span>
+<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a>    curr <span class="op">=</span> df[df[<span class="st">"State"</span>] <span class="op">==</span> s]</span>
+<span id="cb24-4"><a href="#cb24-4" aria-hidden="true" tabindex="-1"></a>    admit_count <span class="op">=</span> curr[curr[<span class="st">"Decision"</span>] <span class="op">==</span> <span class="st">"Admit"</span>].shape[<span class="dv">0</span>]</span>
+<span id="cb24-5"><a href="#cb24-5" aria-hidden="true" tabindex="-1"></a>    wait_count <span class="op">=</span> curr[curr[<span class="st">"Decision"</span>] <span class="op">==</span> <span class="st">"Waitlist"</span>].shape[<span class="dv">0</span>]</span>
+<span id="cb24-6"><a href="#cb24-6" aria-hidden="true" tabindex="-1"></a>    decline_count <span class="op">=</span> curr[curr[<span class="st">"Decision"</span>] <span class="op">==</span> <span class="st">"Decline"</span>].shape[<span class="dv">0</span>]</span>
+<span id="cb24-7"><a href="#cb24-7" aria-hidden="true" tabindex="-1"></a>    df.loc[df[<span class="st">"State"</span>] <span class="op">==</span> s, <span class="st">"AdmitRate"</span>] <span class="op">=</span> (admit_count<span class="op">/</span>curr.shape[<span class="dv">0</span>]) <span class="op">*</span> <span class="dv">100</span></span>
+<span id="cb24-8"><a href="#cb24-8" aria-hidden="true" tabindex="-1"></a>    df.loc[df[<span class="st">"State"</span>] <span class="op">==</span> s, <span class="st">"WaitlistRate"</span>] <span class="op">=</span> (wait_count<span class="op">/</span>curr.shape[<span class="dv">0</span>]) <span class="op">*</span> <span class="dv">100</span></span>
+<span id="cb24-9"><a href="#cb24-9" aria-hidden="true" tabindex="-1"></a>    df.loc[df[<span class="st">"State"</span>] <span class="op">==</span> s, <span class="st">"DeclineRate"</span>] <span class="op">=</span> (decline_count<span class="op">/</span>curr.shape[<span class="dv">0</span>]) <span class="op">*</span> <span class="dv">100</span></span>
+<span id="cb24-10"><a href="#cb24-10" aria-hidden="true" tabindex="-1"></a>df.head()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="221">
+
+<div>
+
+<table class="dataframe table table-sm table-striped">
+  <thead>
+    <tr>
+      <th></th>
+      <th>Decision</th>
+      <th>State</th>
+      <th>GPA</th>
+      <th>WorkExp</th>
+      <th>TestScore</th>
+      <th>WritingScore</th>
+      <th>Gender</th>
+      <th>VolunteerLevel</th>
+      <th>AdmitRate</th>
+      <th>WaitlistRate</th>
+      <th>DeclineRate</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>Waitlist</td>
+      <td>Alabama</td>
+      <td>3.41</td>
+      <td>1.2</td>
+      <td>868</td>
+      <td>85</td>
+      <td>Female</td>
+      <td>0</td>
+      <td>0.0</td>
+      <td>100.000000</td>
+      <td>0.000000</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>Admit</td>
+      <td>California</td>
+      <td>3.90</td>
+      <td>6.7</td>
+      <td>962</td>
+      <td>100</td>
+      <td>Male</td>
+      <td>0</td>
+      <td>75.0</td>
+      <td>16.666667</td>
+      <td>8.333333</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>Admit</td>
+      <td>California</td>
+      <td>3.88</td>
+      <td>1.5</td>
+      <td>967</td>
+      <td>95</td>
+      <td>Male</td>
+      <td>5</td>
+      <td>75.0</td>
+      <td>16.666667</td>
+      <td>8.333333</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>Admit</td>
+      <td>California</td>
+      <td>3.70</td>
+      <td>1.2</td>
+      <td>969</td>
+      <td>94</td>
+      <td>Male</td>
+      <td>2</td>
+      <td>75.0</td>
+      <td>16.666667</td>
+      <td>8.333333</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>Admit</td>
+      <td>California</td>
+      <td>3.70</td>
+      <td>1.4</td>
+      <td>966</td>
+      <td>94</td>
+      <td>Male</td>
+      <td>0</td>
+      <td>75.0</td>
+      <td>16.666667</td>
+      <td>8.333333</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+</div>
+</div>
+<div class="cell" data-execution_count="222">
+<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Get relevant column averages by state</span></span>
+<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a>averages_by_state <span class="op">=</span> df.groupby(<span class="st">'State'</span>)[[<span class="st">"AdmitRate"</span>, <span class="st">"WaitlistRate"</span>, <span class="st">"DeclineRate"</span>, <span class="st">"GPA"</span>, <span class="st">"TestScore"</span>, <span class="st">"WritingScore"</span>, <span class="st">"VolunteerLevel"</span>]].mean().reset_index()</span>
+<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a>state_id_dict <span class="op">=</span> <span class="bu">dict</span>(<span class="bu">zip</span>(data.population_engineers_hurricanes()[<span class="st">"state"</span>], data.population_engineers_hurricanes()[<span class="st">"id"</span>]))</span>
+<span id="cb25-4"><a href="#cb25-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Map state ids</span></span>
+<span id="cb25-5"><a href="#cb25-5" aria-hidden="true" tabindex="-1"></a>averages_by_state[<span class="st">"StateID"</span>] <span class="op">=</span> averages_by_state[<span class="st">"State"</span>].<span class="bu">map</span>(state_id_dict)</span>
+<span id="cb25-6"><a href="#cb25-6" aria-hidden="true" tabindex="-1"></a>averages_by_state</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="222">
+
+<div>
+
+<table class="dataframe table table-sm table-striped">
+  <thead>
+    <tr>
+      <th></th>
+      <th>State</th>
+      <th>AdmitRate</th>
+      <th>WaitlistRate</th>
+      <th>DeclineRate</th>
+      <th>GPA</th>
+      <th>TestScore</th>
+      <th>WritingScore</th>
+      <th>VolunteerLevel</th>
+      <th>StateID</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>Alabama</td>
+      <td>0.000000</td>
+      <td>100.000000</td>
+      <td>0.000000</td>
+      <td>3.410000</td>
+      <td>868.000000</td>
+      <td>85.000000</td>
+      <td>0.000000</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>California</td>
+      <td>75.000000</td>
+      <td>16.666667</td>
+      <td>8.333333</td>
+      <td>3.600833</td>
+      <td>916.166667</td>
+      <td>90.833333</td>
+      <td>2.666667</td>
+      <td>6</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>Colorado</td>
+      <td>44.444444</td>
+      <td>22.222222</td>
+      <td>33.333333</td>
+      <td>3.467222</td>
+      <td>877.055556</td>
+      <td>80.000000</td>
+      <td>2.444444</td>
+      <td>8</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>Florida</td>
+      <td>31.428571</td>
+      <td>31.428571</td>
+      <td>37.142857</td>
+      <td>3.559143</td>
+      <td>872.571429</td>
+      <td>80.428571</td>
+      <td>2.457143</td>
+      <td>12</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>Mississippi</td>
+      <td>0.000000</td>
+      <td>0.000000</td>
+      <td>100.000000</td>
+      <td>2.910000</td>
+      <td>753.000000</td>
+      <td>77.000000</td>
+      <td>1.000000</td>
+      <td>28</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>New York</td>
+      <td>0.000000</td>
+      <td>100.000000</td>
+      <td>0.000000</td>
+      <td>3.550000</td>
+      <td>866.000000</td>
+      <td>74.000000</td>
+      <td>1.000000</td>
+      <td>36</td>
+    </tr>
+    <tr>
+      <th>6</th>
+      <td>Oregon</td>
+      <td>0.000000</td>
+      <td>0.000000</td>
+      <td>100.000000</td>
+      <td>2.900000</td>
+      <td>769.000000</td>
+      <td>87.000000</td>
+      <td>4.000000</td>
+      <td>41</td>
+    </tr>
+    <tr>
+      <th>7</th>
+      <td>Utah</td>
+      <td>16.666667</td>
+      <td>50.000000</td>
+      <td>33.333333</td>
+      <td>3.443333</td>
+      <td>850.666667</td>
+      <td>78.333333</td>
+      <td>2.500000</td>
+      <td>49</td>
+    </tr>
+    <tr>
+      <th>8</th>
+      <td>Vermont</td>
+      <td>0.000000</td>
+      <td>100.000000</td>
+      <td>0.000000</td>
+      <td>3.530000</td>
+      <td>862.000000</td>
+      <td>85.000000</td>
+      <td>1.000000</td>
+      <td>50</td>
+    </tr>
+    <tr>
+      <th>9</th>
+      <td>Virginia</td>
+      <td>0.000000</td>
+      <td>0.000000</td>
+      <td>100.000000</td>
+      <td>3.142500</td>
+      <td>766.000000</td>
+      <td>76.500000</td>
+      <td>3.250000</td>
+      <td>51</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+</div>
+</div>
+<div class="cell" data-execution_count="223">
+<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a>states <span class="op">=</span> alt.topo_feature(<span class="st">'https://raw.githubusercontent.com/vega/vega-datasets/master/data/us-10m.json'</span>, <span class="st">'states'</span>)</span>
+<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a>click <span class="op">=</span> alt.selection_multi(fields <span class="op">=</span> [<span class="st">"State"</span>])</span>
+<span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb26-4"><a href="#cb26-4" aria-hidden="true" tabindex="-1"></a>existing_states <span class="op">=</span> alt.Chart(states).mark_geoshape().encode(</span>
+<span id="cb26-5"><a href="#cb26-5" aria-hidden="true" tabindex="-1"></a>    color <span class="op">=</span> <span class="st">"AdmitRate:Q"</span>,</span>
+<span id="cb26-6"><a href="#cb26-6" aria-hidden="true" tabindex="-1"></a>    tooltip <span class="op">=</span> [<span class="st">"State:N"</span>, <span class="st">"AdmitRate:Q"</span>],</span>
+<span id="cb26-7"><a href="#cb26-7" aria-hidden="true" tabindex="-1"></a>    opacity <span class="op">=</span> alt.condition(<span class="st">'isValid(datum.AdmitRate)'</span>, alt.value(<span class="dv">1</span>), alt.value(<span class="fl">0.2</span>)),</span>
+<span id="cb26-8"><a href="#cb26-8" aria-hidden="true" tabindex="-1"></a>).transform_lookup(</span>
+<span id="cb26-9"><a href="#cb26-9" aria-hidden="true" tabindex="-1"></a>    lookup <span class="op">=</span> <span class="st">"id"</span>,</span>
+<span id="cb26-10"><a href="#cb26-10" aria-hidden="true" tabindex="-1"></a>    from_ <span class="op">=</span> alt.LookupData(averages_by_state, <span class="st">"StateID"</span>, <span class="bu">list</span>(averages_by_state.columns))</span>
+<span id="cb26-11"><a href="#cb26-11" aria-hidden="true" tabindex="-1"></a>).properties(width <span class="op">=</span> <span class="dv">500</span>, height <span class="op">=</span> <span class="dv">300</span>).add_selection(click).project(<span class="bu">type</span> <span class="op">=</span> <span class="st">"albersUsa"</span>)</span>
+<span id="cb26-12"><a href="#cb26-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb26-13"><a href="#cb26-13" aria-hidden="true" tabindex="-1"></a>missing_states <span class="op">=</span> (</span>
+<span id="cb26-14"><a href="#cb26-14" aria-hidden="true" tabindex="-1"></a>    alt.Chart(states)</span>
+<span id="cb26-15"><a href="#cb26-15" aria-hidden="true" tabindex="-1"></a>    .mark_geoshape(fill <span class="op">=</span> <span class="st">"lightgrey"</span>, stroke <span class="op">=</span> <span class="st">"white"</span>)</span>
+<span id="cb26-16"><a href="#cb26-16" aria-hidden="true" tabindex="-1"></a>    .encode(opacity<span class="op">=</span>alt.condition(<span class="st">"isValid(datum.AdmitRate)"</span>, alt.value(<span class="dv">0</span>), alt.value(<span class="fl">0.2</span>))).add_selection(click).project(<span class="bu">type</span> <span class="op">=</span> <span class="st">"albersUsa"</span>))</span>
+<span id="cb26-17"><a href="#cb26-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb26-18"><a href="#cb26-18" aria-hidden="true" tabindex="-1"></a>full_map <span class="op">=</span> existing_states <span class="op">+</span> missing_states</span>
+<span id="cb26-19"><a href="#cb26-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb26-20"><a href="#cb26-20" aria-hidden="true" tabindex="-1"></a>bars <span class="op">=</span> (</span>
+<span id="cb26-21"><a href="#cb26-21" aria-hidden="true" tabindex="-1"></a>    alt.Chart(</span>
+<span id="cb26-22"><a href="#cb26-22" aria-hidden="true" tabindex="-1"></a>        averages_by_state.nlargest(<span class="dv">50</span>, <span class="st">"AdmitRate"</span>),</span>
+<span id="cb26-23"><a href="#cb26-23" aria-hidden="true" tabindex="-1"></a>        title <span class="op">=</span> <span class="st">"Top States by Admission Rate"</span>).mark_bar().encode(</span>
+<span id="cb26-24"><a href="#cb26-24" aria-hidden="true" tabindex="-1"></a>    x <span class="op">=</span> <span class="st">"AdmitRate"</span>,</span>
+<span id="cb26-25"><a href="#cb26-25" aria-hidden="true" tabindex="-1"></a>    opacity <span class="op">=</span> alt.condition(click, alt.value(<span class="dv">1</span>), alt.value(<span class="fl">0.2</span>)),</span>
+<span id="cb26-26"><a href="#cb26-26" aria-hidden="true" tabindex="-1"></a>    color <span class="op">=</span> <span class="st">"AdmitRate"</span>,</span>
+<span id="cb26-27"><a href="#cb26-27" aria-hidden="true" tabindex="-1"></a>    y <span class="op">=</span> alt.Y(<span class="st">"State"</span>, sort <span class="op">=</span> <span class="st">"x"</span>))</span>
+<span id="cb26-28"><a href="#cb26-28" aria-hidden="true" tabindex="-1"></a>.add_selection(click))</span>
+<span id="cb26-29"><a href="#cb26-29" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb26-30"><a href="#cb26-30" aria-hidden="true" tabindex="-1"></a>full_map <span class="op">&amp;</span> bars</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>/Users/miamayerhofer/opt/anaconda3/envs/dsan6600/lib/python3.11/site-packages/altair/utils/deprecation.py:65: AltairDeprecationWarning:
+
+'selection_multi' is deprecated.  Use 'selection_point'
+
+/Users/miamayerhofer/opt/anaconda3/envs/dsan6600/lib/python3.11/site-packages/altair/utils/deprecation.py:65: AltairDeprecationWarning:
+
+'add_selection' is deprecated. Use 'add_params' instead.
+
+/Users/miamayerhofer/opt/anaconda3/envs/dsan6600/lib/python3.11/site-packages/altair/utils/deprecation.py:65: AltairDeprecationWarning:
+
+'add_selection' is deprecated. Use 'add_params' instead.
+</code></pre>
+</div>
+<div class="cell-output cell-output-display" data-execution_count="223">
+
+<style>
+  #altair-viz-3c436bfb8a5a42eb96b04f106a609174.vega-embed {
+    width: 100%;
+    display: flex;
+  }
+
+  #altair-viz-3c436bfb8a5a42eb96b04f106a609174.vega-embed details,
+  #altair-viz-3c436bfb8a5a42eb96b04f106a609174.vega-embed details summary {
+    position: relative;
+  }
+</style>
+<div id="altair-viz-3c436bfb8a5a42eb96b04f106a609174"></div>
+<script type="text/javascript">
+  var VEGA_DEBUG = (typeof VEGA_DEBUG == "undefined") ? {} : VEGA_DEBUG;
+  (function(spec, embedOpt){
+    let outputDiv = document.currentScript.previousElementSibling;
+    if (outputDiv.id !== "altair-viz-3c436bfb8a5a42eb96b04f106a609174") {
+      outputDiv = document.getElementById("altair-viz-3c436bfb8a5a42eb96b04f106a609174");
+    }
+    const paths = {
+      "vega": "https://cdn.jsdelivr.net/npm/vega@5?noext",
+      "vega-lib": "https://cdn.jsdelivr.net/npm/vega-lib?noext",
+      "vega-lite": "https://cdn.jsdelivr.net/npm/vega-lite@5.16.3?noext",
+      "vega-embed": "https://cdn.jsdelivr.net/npm/vega-embed@6?noext",
+    };
+
+    function maybeLoadScript(lib, version) {
+      var key = `${lib.replace("-", "")}_version`;
+      return (VEGA_DEBUG[key] == version) ?
+        Promise.resolve(paths[lib]) :
+        new Promise(function(resolve, reject) {
+          var s = document.createElement('script');
+          document.getElementsByTagName("head")[0].appendChild(s);
+          s.async = true;
+          s.onload = () => {
+            VEGA_DEBUG[key] = version;
+            return resolve(paths[lib]);
+          };
+          s.onerror = () => reject(`Error loading script: ${paths[lib]}`);
+          s.src = paths[lib];
+        });
+    }
+
+    function showError(err) {
+      outputDiv.innerHTML = `<div class="error" style="color:red;">${err}</div>`;
+      throw err;
+    }
+
+    function displayChart(vegaEmbed) {
+      vegaEmbed(outputDiv, spec, embedOpt)
+        .catch(err => showError(`Javascript Error: ${err.message}<br>This usually means there's a typo in your chart specification. See the javascript console for the full traceback.`));
+    }
+
+    if(typeof define === "function" && define.amd) {
+      requirejs.config({paths});
+      require(["vega-embed"], displayChart, err => showError(`Error loading script: ${err.message}`));
+    } else {
+      maybeLoadScript("vega", "5")
+        .then(() => maybeLoadScript("vega-lite", "5.16.3"))
+        .then(() => maybeLoadScript("vega-embed", "6"))
+        .catch(showError)
+        .then(() => displayChart(vegaEmbed));
+    }
+  })({"config": {"view": {"continuousWidth": 300, "continuousHeight": 300}}, "vconcat": [{"layer": [{"mark": {"type": "geoshape"}, "encoding": {"color": {"field": "AdmitRate", "type": "quantitative"}, "opacity": {"condition": {"test": "isValid(datum.AdmitRate)", "value": 1}, "value": 0.2}, "tooltip": [{"field": "State", "type": "nominal"}, {"field": "AdmitRate", "type": "quantitative"}]}, "name": "view_3", "projection": {"type": "albersUsa"}, "transform": [{"lookup": "id", "from": {"data": {"name": "data-78384b042c2d4e9686b43e61521100ca"}, "key": "StateID", "fields": ["State", "AdmitRate", "WaitlistRate", "DeclineRate", "GPA", "TestScore", "WritingScore", "VolunteerLevel", "StateID"]}}]}, {"mark": {"type": "geoshape", "fill": "lightgrey", "stroke": "white"}, "encoding": {"opacity": {"condition": {"test": "isValid(datum.AdmitRate)", "value": 0}, "value": 0.2}}, "projection": {"type": "albersUsa"}}], "data": {"url": "https://raw.githubusercontent.com/vega/vega-datasets/master/data/us-10m.json", "format": {"feature": "states", "type": "topojson"}}, "height": 300, "width": 500}, {"data": {"name": "data-03670c04bad4409bf0f96b6f84f6cdd2"}, "mark": {"type": "bar"}, "encoding": {"color": {"field": "AdmitRate", "type": "quantitative"}, "opacity": {"condition": {"param": "param_2", "value": 1}, "value": 0.2}, "x": {"field": "AdmitRate", "type": "quantitative"}, "y": {"field": "State", "sort": "x", "type": "nominal"}}, "name": "view_4", "title": "Top States by Admission Rate"}], "params": [{"name": "param_2", "select": {"type": "point", "fields": ["State"]}, "views": ["view_3", "view_4"]}], "$schema": "https://vega.github.io/schema/vega-lite/v5.16.3.json", "datasets": {"data-78384b042c2d4e9686b43e61521100ca": [{"State": "Alabama", "AdmitRate": 0.0, "WaitlistRate": 100.0, "DeclineRate": 0.0, "GPA": 3.41, "TestScore": 868.0, "WritingScore": 85.0, "VolunteerLevel": 0.0, "StateID": 1}, {"State": "California", "AdmitRate": 75.0, "WaitlistRate": 16.666666666666664, "DeclineRate": 8.333333333333332, "GPA": 3.6008333333333336, "TestScore": 916.1666666666666, "WritingScore": 90.83333333333333, "VolunteerLevel": 2.6666666666666665, "StateID": 6}, {"State": "Colorado", "AdmitRate": 44.44444444444444, "WaitlistRate": 22.22222222222222, "DeclineRate": 33.33333333333333, "GPA": 3.467222222222222, "TestScore": 877.0555555555555, "WritingScore": 80.0, "VolunteerLevel": 2.4444444444444446, "StateID": 8}, {"State": "Florida", "AdmitRate": 31.428571428571427, "WaitlistRate": 31.428571428571427, "DeclineRate": 37.142857142857146, "GPA": 3.559142857142857, "TestScore": 872.5714285714286, "WritingScore": 80.42857142857143, "VolunteerLevel": 2.4571428571428573, "StateID": 12}, {"State": "Mississippi", "AdmitRate": 0.0, "WaitlistRate": 0.0, "DeclineRate": 100.0, "GPA": 2.91, "TestScore": 753.0, "WritingScore": 77.0, "VolunteerLevel": 1.0, "StateID": 28}, {"State": "New York", "AdmitRate": 0.0, "WaitlistRate": 100.0, "DeclineRate": 0.0, "GPA": 3.55, "TestScore": 866.0, "WritingScore": 74.0, "VolunteerLevel": 1.0, "StateID": 36}, {"State": "Oregon", "AdmitRate": 0.0, "WaitlistRate": 0.0, "DeclineRate": 100.0, "GPA": 2.9, "TestScore": 769.0, "WritingScore": 87.0, "VolunteerLevel": 4.0, "StateID": 41}, {"State": "Utah", "AdmitRate": 16.666666666666664, "WaitlistRate": 50.0, "DeclineRate": 33.33333333333333, "GPA": 3.4433333333333334, "TestScore": 850.6666666666666, "WritingScore": 78.33333333333333, "VolunteerLevel": 2.5, "StateID": 49}, {"State": "Vermont", "AdmitRate": 0.0, "WaitlistRate": 100.0, "DeclineRate": 0.0, "GPA": 3.53, "TestScore": 862.0, "WritingScore": 85.0, "VolunteerLevel": 1.0, "StateID": 50}, {"State": "Virginia", "AdmitRate": 0.0, "WaitlistRate": 0.0, "DeclineRate": 100.0, "GPA": 3.1425, "TestScore": 766.0, "WritingScore": 76.5, "VolunteerLevel": 3.25, "StateID": 51}], "data-03670c04bad4409bf0f96b6f84f6cdd2": [{"State": "California", "AdmitRate": 75.0, "WaitlistRate": 16.666666666666664, "DeclineRate": 8.333333333333332, "GPA": 3.6008333333333336, "TestScore": 916.1666666666666, "WritingScore": 90.83333333333333, "VolunteerLevel": 2.6666666666666665, "StateID": 6}, {"State": "Colorado", "AdmitRate": 44.44444444444444, "WaitlistRate": 22.22222222222222, "DeclineRate": 33.33333333333333, "GPA": 3.467222222222222, "TestScore": 877.0555555555555, "WritingScore": 80.0, "VolunteerLevel": 2.4444444444444446, "StateID": 8}, {"State": "Florida", "AdmitRate": 31.428571428571427, "WaitlistRate": 31.428571428571427, "DeclineRate": 37.142857142857146, "GPA": 3.559142857142857, "TestScore": 872.5714285714286, "WritingScore": 80.42857142857143, "VolunteerLevel": 2.4571428571428573, "StateID": 12}, {"State": "Utah", "AdmitRate": 16.666666666666664, "WaitlistRate": 50.0, "DeclineRate": 33.33333333333333, "GPA": 3.4433333333333334, "TestScore": 850.6666666666666, "WritingScore": 78.33333333333333, "VolunteerLevel": 2.5, "StateID": 49}, {"State": "Alabama", "AdmitRate": 0.0, "WaitlistRate": 100.0, "DeclineRate": 0.0, "GPA": 3.41, "TestScore": 868.0, "WritingScore": 85.0, "VolunteerLevel": 0.0, "StateID": 1}, {"State": "Mississippi", "AdmitRate": 0.0, "WaitlistRate": 0.0, "DeclineRate": 100.0, "GPA": 2.91, "TestScore": 753.0, "WritingScore": 77.0, "VolunteerLevel": 1.0, "StateID": 28}, {"State": "New York", "AdmitRate": 0.0, "WaitlistRate": 100.0, "DeclineRate": 0.0, "GPA": 3.55, "TestScore": 866.0, "WritingScore": 74.0, "VolunteerLevel": 1.0, "StateID": 36}, {"State": "Oregon", "AdmitRate": 0.0, "WaitlistRate": 0.0, "DeclineRate": 100.0, "GPA": 2.9, "TestScore": 769.0, "WritingScore": 87.0, "VolunteerLevel": 4.0, "StateID": 41}, {"State": "Vermont", "AdmitRate": 0.0, "WaitlistRate": 100.0, "DeclineRate": 0.0, "GPA": 3.53, "TestScore": 862.0, "WritingScore": 85.0, "VolunteerLevel": 1.0, "StateID": 50}, {"State": "Virginia", "AdmitRate": 0.0, "WaitlistRate": 0.0, "DeclineRate": 100.0, "GPA": 3.1425, "TestScore": 766.0, "WritingScore": 76.5, "VolunteerLevel": 3.25, "StateID": 51}]}}, {"mode": "vega-lite"});
+</script>
+</div>
+</div>
+</section>
+<section id="chi-sqfishers-exact" class="level3">
+<h3 class="anchored" data-anchor-id="chi-sqfishers-exact">Chi-Sq/Fishers-Exact</h3>
+<div class="cell" data-execution_count="232">
+<div class="sourceCode cell-code" id="cb28"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> scipy.stats <span class="im">import</span> fisher_exact, chi2_contingency</span>
+<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a>cont_table <span class="op">=</span> pd.crosstab(df[<span class="st">"Gender"</span>], df[<span class="st">"Decision"</span>])</span>
+<span id="cb28-4"><a href="#cb28-4" aria-hidden="true" tabindex="-1"></a>cont_table_small <span class="op">=</span> cont_table[[<span class="st">"Admit"</span>, <span class="st">"Decline"</span>]]</span>
+<span id="cb28-5"><a href="#cb28-5" aria-hidden="true" tabindex="-1"></a>odds_ratio, p_value_fish <span class="op">=</span> fisher_exact(cont_table_small)</span>
+<span id="cb28-6"><a href="#cb28-6" aria-hidden="true" tabindex="-1"></a>chi2_stat, p_value_chi2, _, _ <span class="op">=</span> chi2_contingency(cont_table)</span>
+<span id="cb28-7"><a href="#cb28-7" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Odds Ratio:"</span>, odds_ratio)</span>
+<span id="cb28-8"><a href="#cb28-8" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"P-value:"</span>, p_value_fish)</span>
+<span id="cb28-9"><a href="#cb28-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-10"><a href="#cb28-10" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Chi-squared Statistic:"</span>, chi2_stat)</span>
+<span id="cb28-11"><a href="#cb28-11" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"P-value:"</span>, p_value_chi2)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Odds Ratio: 1.0833333333333333
+P-value: 1.0
+Chi-squared Statistic: 0.023444060282783778
+P-value: 0.9883464051925749</code></pre>
+</div>
+</div>
+</section>
+
+</main>
+<!-- /main column -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    target: function(trigger) {
+      return trigger.previousElementSibling;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+  function tippyHover(el, contentFn) {
+    const config = {
+      allowHTML: true,
+      content: contentFn,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start'
+    };
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      return note.innerHTML;
+    });
+  }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+</div> <!-- /content -->
+
+
+
+</body></html>
