@@ -8,6 +8,7 @@ project:
 website:
   title: Intern Insight
   navbar:
+    logo: "images/logo.png"
     background: '#0e6ba8'
     right:
       - icon: github
